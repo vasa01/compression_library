@@ -18,7 +18,8 @@ OpenCV 3.1
 C ++ 11
 Compiler g ++
 
-
+Github:
+https://github.com/vasa01/compression_library
 
 ###############################################################################
 # Help  - compression library                                                 #
