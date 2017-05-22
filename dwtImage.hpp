@@ -64,11 +64,11 @@ public:
         type(type), isSubBandsCreate(false), isEmpty(false) {
 	}
 
-    int DwtImage::w() {
+    int w() {
         return width;
     }
 
-    int DwtImage::h(){
+    int h(){
         return height;
     }
 
@@ -83,7 +83,7 @@ public:
 	 * @return	Null if it fails, else the new bands.
 	 **************************************************************************************************/
 
-	std::vector<DwtImage*> DwtImage::createBands() {
+	std::vector<DwtImage*> createBands() {
 		assert(!img.empty());
 		std::vector<DwtImage*> sub;
 		matLL = cv::Mat(img, cv::Rect(0, 0, img.cols / 2, img.rows / 2));
@@ -108,12 +108,12 @@ public:
 	 *
 	 * @return	The level.
 	 **************************************************************************************************/
-	int DwtImage::getMaxLevel() {
+	int getMaxLevel() {
 		assert(!isEmpty);
 		return maxLevels;
 	}
 
-	int DwtImage::getLevel() {
+	int getLevel() {
 		assert(!isEmpty);
 		return level;
 	}
@@ -128,13 +128,13 @@ public:
 	 *
 	 * @return	The channel.
 	 **************************************************************************************************/
-	int DwtImage::getMaxChannel() {
+	int getMaxChannel() {
 		assert(!isEmpty);
 		return maxChannels;
 	}
 
 
-	int DwtImage::getChannel() {
+	int getChannel() {
 		assert(!isEmpty);
 		return channel;
 	}
@@ -150,7 +150,7 @@ public:
 	 * @return	The image.
 	 **************************************************************************************************/
 
-	cv::Mat DwtImage::getImage() {
+	cv::Mat getImage() {
 		assert(!img.empty());
 		return img;
 	}
@@ -166,7 +166,7 @@ public:
 	 * @return	The type sub.
 	 **************************************************************************************************/
 
-	std::string DwtImage::getTypeSub() {
+	std::string getTypeSub() {
 		switch (type) {
 		case Bands::EMPTY:
 				return "EMPTY";
@@ -194,8 +194,12 @@ public:
 	 * @return	The type sub bands.
 	 **************************************************************************************************/
 
-	Bands DwtImage::getTypeSubBands() {
+	Bands getTypeSubBands() {
 		return type;
+	}
+
+	void setImage(cv::Mat mat) {
+		this->img = mat.clone();
 	}
 };
 #endif 

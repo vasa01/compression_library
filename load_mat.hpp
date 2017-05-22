@@ -12,7 +12,7 @@
 //#include <stdio.h>
 //#include <math.h>
 //#include "wavelet2D.hpp"
-//#include "mat.hpp"
+#include "mat.hpp"
 //#include "contourlet.hpp"
 //#include "dfb.hpp"
 //#include "ezbc.hpp"

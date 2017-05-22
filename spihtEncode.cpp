@@ -1,9 +1,34 @@
-
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+/**
+ * @file	spihtEncode.cpp
+ *
+ * @brief	SPIHT implementation.
+ */
 #include "spihtEncode.hpp"
 
 
 //#include "utils.h"
-
+/**
+ * init list
+ * @param bout - output bitstream
+ */
 void SPIHT_Encoder::initialize( BitOutputStream* bout) {
 	lip.clear();
 	lsp.clear();
@@ -32,11 +57,11 @@ void SPIHT_Encoder::initialize( BitOutputStream* bout) {
 	//for(int y = 0; y < subIm[0].h(); y++)
 	//	for(int x = 0; x < subIm[0].w(); x++) {
 	//		//cout << "x=" << x << " y=" << y << endl;
-	//		//množina indexù(souøadnic) koøenù.Spadají sem koeficienty z nejvyšší úrovnì rozkladu, pøípadnì též DC koeficient
+	//		//mnoï¿½ina indexï¿½(souï¿½adnic) koï¿½enï¿½.Spadajï¿½ sem koeficienty z nejvyï¿½ï¿½ï¿½ ï¿½rovnï¿½ rozkladu, pï¿½ï¿½padnï¿½ tï¿½ DC koeficient
 	//		lip.push_back(PixItem(x, y));
 	//		if(x >= (subIm[0].w() / (2)) || y >= (subIm[0].h() / (2))){//if ((x % 2 != 0) || (y % 2 != 0)) {
 	//			//cout << "push" << endl;
-	//			//pouze ty prvky z lip, které mají pøímé potomky, jako prvky typu A
+	//			//pouze ty prvky z lip, kterï¿½ majï¿½ pï¿½ï¿½mï¿½ potomky, jako prvky typu A
 	//			lis.push_back(SetItem(x, y, LIS_A));
 	//		}
 	//}
@@ -48,6 +73,15 @@ void SPIHT_Encoder::initialize( BitOutputStream* bout) {
 	cout << endl;*/
 }
 
+/**
+ * get_successor
+ * @param x
+ * @param y
+ * @param sx
+ * @param sy
+ * @param childNumber
+ * @param s_type
+ */
 void SPIHT_Encoder::get_successor(int x, int y, int* sx, int* sy, int childNumber, SPIHT_Type s_type) {
 	//cout << "get_successor" << endl;
 	*sx = 2 * x;
@@ -60,7 +94,14 @@ void SPIHT_Encoder::get_successor(int x, int y, int* sx, int* sy, int childNumbe
 
 }
 
-
+/**
+ * is_significant_pixel
+ * @param x
+ * @param y
+ * @param childNumber
+ * @param s_type
+ * @return
+ */
 bool SPIHT_Encoder::is_significant_pixel( int x, int y,int childNumber, SPIHT_Type s_type) {
 	//cout << "signi" << endl;
 	bool result =  std::abs(spiht.get(cv::Point(x, y), childNumber, s_type)) >= (1 << step);
@@ -83,6 +124,15 @@ bool SPIHT_Encoder::is_significant_pixel( int x, int y,int childNumber, SPIHT_Ty
 	//return ;// (std::abs(im->get(y, x)) >= (1 << step));
 }
 
+/**
+ * is_significant_set_A
+ * @param x
+ * @param y
+ * @param childrenNumber
+ * @param s_type
+ * @param count
+ * @return
+ */
 bool SPIHT_Encoder::is_significant_set_A( int x, int y, int childrenNumber, SPIHT_Type s_type, int count) {
 	//cout << "is_significant_set_A" << endl;
 	if(count > 1 && is_significant_pixel( x, y, childrenNumber,s_type))
@@ -103,6 +153,15 @@ bool SPIHT_Encoder::is_significant_set_A( int x, int y, int childrenNumber, SPIH
 	return false;
 }
 
+/**
+ * is_significant_set_B
+ * @param x
+ * @param y
+ * @param childrenNumber
+ * @param s_type
+ * @param count
+ * @return
+ */
 bool SPIHT_Encoder::is_significant_set_B( int x, int y, int childrenNumber, SPIHT_Type s_type,int count) {
 	if(count > 2 && is_significant_pixel(x, y, childrenNumber, s_type))
 		return true;
@@ -121,6 +180,11 @@ bool SPIHT_Encoder::is_significant_set_B( int x, int y, int childrenNumber, SPIH
 	return false;
 }
 
+/**
+ * encode
+ * @param bits - max bits size
+ * @param bout - bitstrem output
+ */
 void SPIHT_Encoder::encode( int bits,  BitOutputStream* bout) {
 	initialize( bout);
 	//cout << "po innit" << endl;
@@ -272,6 +336,10 @@ void SPIHT_Encoder::encode( int bits,  BitOutputStream* bout) {
 	cout << endl;
 }
 
+/**
+ * inti lists
+ * @param bout
+ */
 	void SPIHT_Encoder_Contourlet::initialize(BitOutputStream* bout) {
 		lip.clear();
 		lsp.clear();
@@ -334,6 +402,16 @@ void SPIHT_Encoder::encode( int bits,  BitOutputStream* bout) {
 
 	}
 
+/**
+ * get_successor
+ * @param x
+ * @param y
+ * @param sx
+ * @param sy
+ * @param childNumber
+ * @param direction
+ * @param s_type
+ */
 	void SPIHT_Encoder_Contourlet::get_successor(int x, int y, int* sx, int* sy, int childNumber, int direction, SPIHT_Type s_type) {
 		//cout << "get_successor" << endl;
 		*sx = 2 * x;
@@ -351,7 +429,15 @@ void SPIHT_Encoder::encode( int bits,  BitOutputStream* bout) {
 		
 
 	}
-
+/**
+ * is_significant_pixel
+ * @param x
+ * @param y
+ * @param childNumber
+ * @param direction
+ * @param s_type
+ * @return
+ */
 	bool SPIHT_Encoder_Contourlet::is_significant_pixel(int x, int y, int childNumber,int direction, SPIHT_Type s_type) {
 		//cout << "child: "<< childNumber << endl;
 		bool result;
@@ -371,6 +457,16 @@ void SPIHT_Encoder::encode( int bits,  BitOutputStream* bout) {
 		return result;
 	}
 
+/**
+ * is_significant_set_A
+ * @param x
+ * @param y
+ * @param childrenNumber
+ * @param direction
+ * @param s_type
+ * @param count
+ * @return
+ */
 	bool SPIHT_Encoder_Contourlet::is_significant_set_A(int x, int y, int childrenNumber,int direction, SPIHT_Type s_type, int count) {
 		//cout << "is_significant_set_A" << endl;
 		if (count > 1 && is_significant_pixel(x, y, childrenNumber, direction, s_type))
@@ -392,6 +488,16 @@ void SPIHT_Encoder::encode( int bits,  BitOutputStream* bout) {
 		return false;
 	}
 
+/**
+ * is_significant_set_B
+ * @param x
+ * @param y
+ * @param childrenNumber
+ * @param direction
+ * @param s_type
+ * @param count
+ * @return
+ */
 	bool SPIHT_Encoder_Contourlet::is_significant_set_B(int x, int y, int childrenNumber,  int direction, SPIHT_Type s_type, int count) {
 		if (count > 2 && is_significant_pixel(x, y, childrenNumber, direction, s_type))
 			return true;
@@ -410,6 +516,14 @@ void SPIHT_Encoder::encode( int bits,  BitOutputStream* bout) {
 		return false;
 	}
 
+/**
+ * get point in struct
+ * @param point
+ * @param childNumber
+ * @param direction
+ * @param s_type
+ * @return
+ */
 	int32_t SPIHT_Encoder_Contourlet::get(cv::Point point, int childNumber, int direction, SPIHT_Type s_type) {
 		//cout << "get" << endl;
 		if (s_type == SPIHT_Type::LOW) {
@@ -426,6 +540,11 @@ void SPIHT_Encoder::encode( int bits,  BitOutputStream* bout) {
 		}
 	}
 
+/**
+ * encode
+ * @param bits - max bits size
+ * @param bout - bit stream output
+ */
 	void SPIHT_Encoder_Contourlet::encode(int bits, BitOutputStream* bout) {
 		initialize(bout);
 		

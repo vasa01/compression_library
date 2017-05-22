@@ -1,3 +1,28 @@
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+
+/**
+ * @file	mq_encoder2.cpp
+ *
+ * @brief	mq encoder implementation.
+ */
+
 #include "mq_encoder2.hpp"
 
 MQ_Encoder::MQ_Encoder()
@@ -5,22 +30,38 @@ MQ_Encoder::MQ_Encoder()
 	init();
 	}
 
+/**
+ * MQ_Encoder
+ * @param _buf
+ * @param max_len
+ */
 MQ_Encoder::MQ_Encoder(uint8_t *_buf, const int32_t& max_len): outbuf(_buf), outbuf_pos(-1), outbuf_max_len(max_len)
 	{
 	init();
 	}
-
+/**
+ * reset
+ */
 void MQ_Encoder::reset()
 	{
 	outbuf_pos = -1;
 	init();
 	}
 
+/**
+ * get data len
+ * @return - len buf
+ */
 int32_t MQ_Encoder::get_data_len()
 	{
 	return outbuf_pos + 1;
 	}
 
+/**
+ * Put bit and ctx
+ * @param bit
+ * @param ctx
+ */
 void MQ_Encoder::put_bit(const bool& bit, const uint8_t& ctx)// throw (error)
 	{
 	/*if(outbuf_pos < 2){
@@ -34,7 +75,10 @@ void MQ_Encoder::put_bit(const bool& bit, const uint8_t& ctx)// throw (error)
 		}
 	}
 
-void MQ_Encoder::flush()// throw (error)
+/**
+ * flush
+ */
+void MQ_Encoder::flush()
 	{
 	const uint32_t tmp_C = C + A;
 	C |= 0xFFFF;
@@ -51,6 +95,9 @@ void MQ_Encoder::flush()// throw (error)
 		}
 	}
 
+/**
+ * init
+ */
 void MQ_Encoder::init()
 	{
 	mq_coder::init();
@@ -61,6 +108,10 @@ void MQ_Encoder::init()
 	outbuf_pos = -1;
 	}
 
+/**
+ * code MPS ctx
+ * @param cx
+ */
 void MQ_Encoder::code_mps(const uint8_t& cx) //throw (error)
 	{
 	const state_t& state = *state_mapping[cx];
@@ -83,6 +134,10 @@ void MQ_Encoder::code_mps(const uint8_t& cx) //throw (error)
 		}
 	}
 
+/**
+ * code_lps
+ * @param cx
+ */
 void MQ_Encoder::code_lps(const uint8_t & cx)// throw (error)
 	{
 	const state_t& state = *state_mapping[cx];
@@ -101,6 +156,9 @@ void MQ_Encoder::code_lps(const uint8_t & cx)// throw (error)
 	renorm();
 	}
 
+/**
+ * renorm on byte
+ */
 void MQ_Encoder::renorm()// throw (error)
 	{
 		do {
@@ -113,6 +171,9 @@ void MQ_Encoder::renorm()// throw (error)
 		} while(!(A & 0x8000));
 	}
 
+/**
+ * byte out to buffer
+ */
 void MQ_Encoder::byte_out()// throw (error)
 	{
 	if(outbuf_pos < 0 || outbuf[outbuf_pos] != 0xFF) {

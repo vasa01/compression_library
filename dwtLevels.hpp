@@ -36,12 +36,22 @@
 
 class DwtLevels {
 private:
-	DwtImage **images;
+	//DwtImage **images;
+	std::vector< std::vector<DwtImage>> images;
 	int levels;
 	int maxLevel;
 	int maxChannel;
 	bool isEmpty;
 	int block_size;
+	int q;
+
+	cv::Mat quant(cv::Mat mat, int level, int maxLevel) {
+		cv::Mat result = mat.clone();
+
+		result /= (1.25*(level+1));
+
+		return result;
+	}
 public:
 
 	/**********************************************************************************************//**
@@ -56,13 +66,21 @@ public:
 	 * @param	maxChannel	The maximum channel.
 	 **************************************************************************************************/
 
-	DwtLevels( int maxLevel, int maxChannel, int block_size) {
+	DwtLevels( int maxLevel, int maxChannel, int block_size, int q) {
 		this->maxChannel = maxChannel;
 		this->maxLevel = maxLevel;
 		this->block_size = block_size;
-		images = new DwtImage*[maxLevel];
+		this->q =q;
+		/*images = new DwtImage*[maxLevel];
 		for (int i = 0; i < maxLevel; ++i)
-			images[i] = new DwtImage[maxChannel];
+			images[i] = new DwtImage[maxChannel];*/
+		for(int i = 0; i < maxLevel; i++){
+			std::vector<DwtImage> temp;
+			for(int ii=0; ii < maxChannel; ii++){
+				temp.push_back(DwtImage());			
+			}
+			images.push_back(temp); 
+		}
 		isEmpty = true;
 	};
 
@@ -80,7 +98,7 @@ public:
 	 * @return	The dwt images by level and channel.
 	 **************************************************************************************************/
 
-	DwtImage DwtLevels::getDwtImagesByLevelAndChannel(int level, int channel) {
+	DwtImage getDwtImagesByLevelAndChannel(int level, int channel) {
 		return images[level][channel];
 	}
 
@@ -97,7 +115,7 @@ public:
 	 * @param	channel 	The channel.
 	 **************************************************************************************************/
 
-	void DwtLevels::setDwtImagesByLevelAndChannel(DwtImage dwtImage, int level, int channel) {
+	void setDwtImagesByLevelAndChannel(DwtImage dwtImage, int level, int channel) {
 		images[level][channel] = dwtImage;
 		isEmpty = false;
 	}
@@ -113,7 +131,7 @@ public:
 	 * @param	dwtImage	The dwt image.
 	 **************************************************************************************************/
 
-	void DwtLevels::setDwtImagesByLevelAndChannel(DwtImage dwtImage) {
+	void setDwtImagesByLevelAndChannel(DwtImage dwtImage) {
 		images[dwtImage.getLevel()][dwtImage.getChannel()] = dwtImage;
 		isEmpty = false;
 	}
@@ -129,7 +147,7 @@ public:
 	 * @return	True if it succeeds, false if it fails.
 	 **************************************************************************************************/
 
-	bool DwtLevels::getIsEmpty() {
+	bool getIsEmpty() {
 		return isEmpty;
 	}
 
@@ -144,7 +162,7 @@ public:
 	 * @return	The maximum level.
 	 **************************************************************************************************/
 
-	int DwtLevels::getMaxLevel() {
+	int getMaxLevel() {
 		return maxLevel;
 	}
 
@@ -159,22 +177,22 @@ public:
 	 * @return	The maximum chanel.
 	 **************************************************************************************************/
 
-	int DwtLevels::getMaxChanel() {
+	int getMaxChanel() {
 		return maxChannel;
 	}
 
-	vector<DwtImage*> getImagesVec2() {
-		vector<DwtImage*> vectorImages;
+	std::vector<DwtImage*> getImagesVec2() {
+		std::vector<DwtImage*> vectorImages;
 
-		vector<DwtImage*> LL;
-		vector<DwtImage*> HL;
-		vector<DwtImage*> LH;
-		vector<DwtImage*> HH;
+		std::vector<DwtImage*> LL;
+		std::vector<DwtImage*> HL;
+		std::vector<DwtImage*> LH;
+		std::vector<DwtImage*> HH;
 
 		for (int l = maxLevel - 1; l > -1; l--) {
 			for (int ch = 0; ch < maxChannel; ch++) {
 				try {
-					vector<DwtImage*> temp = getDwtImagesByLevelAndChannel(l, ch).createBands();
+					std::vector<DwtImage*> temp = getDwtImagesByLevelAndChannel(l, ch).createBands();
 					for (int i = 0; i < temp.size(); i++) {
 						if (temp[i]->getLevel() < maxLevel - 1 && temp[i]->getTypeSubBands() == Bands::LL) {
 							continue;
@@ -200,7 +218,7 @@ public:
 
 				}
 				catch (const std::exception&) {
-					cout << "<-level: " << l << " channel: " << ch << endl;
+					std::cout << "<-level: " << l << " channel: " << ch << std::endl;
 				}
 
 			}
@@ -228,18 +246,18 @@ public:
 		return vectorImages;
 	}
 
-	vector<DwtImage*> getImagesVec3() {
-		vector<DwtImage*> vectorImages;
+	std::vector<DwtImage*> getImagesVec3() {
+		std::vector<DwtImage*> vectorImages;
 
-		deque<DwtImage*> LL;
-		deque<DwtImage*> HL;
-		deque<DwtImage*> LH;
-		deque<DwtImage*> HH;
+		std::deque<DwtImage*> LL;
+		std::deque<DwtImage*> HL;
+		std::deque<DwtImage*> LH;
+		std::deque<DwtImage*> HH;
 
 		for (int l = maxLevel - 1; l > -1; l--) {
 			for (int ch = 0; ch < maxChannel; ch++) {
 				try {
-					vector<DwtImage*> temp = getDwtImagesByLevelAndChannel(l, ch).createBands();
+					std::vector<DwtImage*> temp = getDwtImagesByLevelAndChannel(l, ch).createBands();
 					for (int i = 0; i < temp.size(); i++) {
 						if (temp[i]->getLevel() < maxLevel - 1 && temp[i]->getTypeSubBands() == Bands::LL) {
 							continue;
@@ -271,7 +289,7 @@ public:
 
 				}
 				catch (const std::exception&) {
-					cout << "<-level: " << l << " channel: " << ch << endl;
+					std::cout << "<-level: " << l << " channel: " << ch << std::endl;
 				}
 
 			}
@@ -299,7 +317,7 @@ public:
 		
 		
 		while(1) {
-			vector<cv::Mat> blocks64;
+			std::vector<cv::Mat> blocks64;
 			for(int ch = 0; ch < maxChannel; ch++) {
 				auto ll = LL.front();
 				LL.pop_front();
@@ -346,7 +364,7 @@ public:
 			}
 		}
 
-		vector<DwtImage*> vectorImages2;
+		std::vector<DwtImage*> vectorImages2;
 		for (int i = 0; i < vectorImages.size(); i++) {
 			DwtImage* dwt = vectorImages[i];
 			cv::Mat image = dwt->getImage();
@@ -376,22 +394,35 @@ public:
 			}
 		}
 
-		return vectorImages2;
+		std::vector<DwtImage*> snad;
+		if(q){
+		for(int i = 0; i < vectorImages2.size(); i++) {
+			DwtImage* dwt = vectorImages2[i];
+			cv::Mat edit = quant(dwt->getImage(), dwt->getLevel(), dwt->getMaxLevel());
+			snad.push_back(new DwtImage(edit, dwt->getLevel(),dwt->getChannel(),dwt->getMaxLevel(), dwt->getMaxChannel(),dwt->getTypeSubBands()) );
+		}
+		}
+		else{
+			snad= vectorImages2;
+		}
+
+
+		return snad;
 	}
 
-	vector<DwtImage*> getImagesVec4() {
-		vector<DwtImage*> vectorImages;
+	std::vector<DwtImage*> getImagesVec4() {
+		std::vector<DwtImage*> vectorImages;
 
-		vector<DwtImage*> LL;
-		vector<DwtImage*> HL;
-		vector<DwtImage*> LH;
-		vector<DwtImage*> HH;
+		std::vector<DwtImage*> LL;
+		std::vector<DwtImage*> HL;
+		std::vector<DwtImage*> LH;
+		std::vector<DwtImage*> HH;
 
 		
 		for(int ch = 0; ch < maxChannel; ch++) {
 			for(int l = maxLevel - 1; l > -1; l--) {
 				try {
-					vector<DwtImage*> temp = getDwtImagesByLevelAndChannel(l, ch).createBands();
+					std::vector<DwtImage*> temp = getDwtImagesByLevelAndChannel(l, ch).createBands();
 					for(int i = 0; i < temp.size(); i++) {
 						if(temp[i]->getLevel() < maxLevel - 1 && temp[i]->getTypeSubBands() == Bands::LL) {
 							continue;
@@ -417,7 +448,7 @@ public:
 
 					}
 				catch(const std::exception&) {
-					cout << "<-level: " << l << " channel: " << ch << endl;
+					std::cout << "<-level: " << l << " channel: " << ch << std::endl;
 					}
 
 				}
@@ -445,18 +476,18 @@ public:
 		return vectorImages;
 	}
 
-	vector<DwtImage*> getImagesVec() {
-		vector<DwtImage*> vectorImages;
+	std::vector<DwtImage*> getImagesVec() {
+		std::vector<DwtImage*> vectorImages;
 
-		vector<DwtImage*> LL;
-		vector<DwtImage*> HL;
-		vector<DwtImage*> LH;
-		vector<DwtImage*> HH;
+		std::vector<DwtImage*> LL;
+		std::vector<DwtImage*> HL;
+		std::vector<DwtImage*> LH;
+		std::vector<DwtImage*> HH;
 
 		for (int l = maxLevel - 1; l > -1; l--) {
 			for (int ch = 0; ch < maxChannel; ch++) {
 				try {
-					vector<DwtImage*> temp = getDwtImagesByLevelAndChannel(l, ch).createBands();
+					std::vector<DwtImage*> temp = getDwtImagesByLevelAndChannel(l, ch).createBands();
 					for (int i = 0; i < temp.size(); i++) {
 						if (temp[i]->getLevel() < maxLevel - 1 && temp[i]->getTypeSubBands() == Bands::LL) {
 							continue;
@@ -482,7 +513,7 @@ public:
 
 				}
 				catch (const std::exception&) {
-					cout << "<-level: " << l << " channel: " << ch << endl;
+					std::cout << "<-level: " << l << " channel: " << ch << std::endl;
 				}
 
 			}
@@ -507,7 +538,25 @@ public:
 			HH.clear();
 
 		}
-		return vectorImages;
+		std::vector<DwtImage*> snad;
+		if(q){
+		
+		for(int i = 0; i < vectorImages.size(); i++) {
+			DwtImage* dwt = vectorImages[i];
+			cv::Mat edit = quant(dwt->getImage(), dwt->getLevel(), dwt->getMaxLevel());
+			snad.push_back(new DwtImage(edit, dwt->getLevel(),dwt->getChannel(),dwt->getMaxLevel(), dwt->getMaxChannel(),dwt->getTypeSubBands()) );
+		}
+		}else{
+			snad = 	vectorImages;	
+		}
+
+		return snad;
+	}
+
+	void quant(){
+		for(int i = 0; i < images.size(); i++){
+
+		}
 	}
 };
 #endif 

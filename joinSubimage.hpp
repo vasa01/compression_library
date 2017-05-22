@@ -1,3 +1,28 @@
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+
+/**
+ * @file	joinSubimage.cpp
+ *
+ * @brief	joinSubimage implementation.
+ */
+
 #ifndef JOIN_SUBIMAGE_H
 #define JOIN_SUBIMAGE_H
 
@@ -24,6 +49,13 @@
 //using namespace cv;
 using namespace std;
 
+/**
+ * splitVector
+ * @tparam T
+ * @param vec
+ * @param n
+ * @return - vector of vector
+ */
 template<typename T>
 std::vector<std::vector<T>> splitVector(const std::vector<T>& vec, size_t n)
 {
@@ -44,16 +76,31 @@ std::vector<std::vector<T>> splitVector(const std::vector<T>& vec, size_t n)
 	return outVec;
 }
 
+/**
+ * class JoinSubimage
+ */
 class JoinSubimage {
 public:
-	JoinSubimage(int _width, int _height, int _maxLevel, int _maxChannel, int _block_size) :width(_width), height(_height), maxLevel(_maxLevel), maxChannel(_maxChannel) {
+	/**
+	 * create joinImage
+	 * @param _width
+	 * @param _height
+	 * @param _maxLevel
+	 * @param _maxChannel
+	 * @param _block_size
+	 */
+	JoinSubimage(int _width, int _height, int _maxLevel, int _maxChannel, int _block_size, int q) :width(_width), height(_height), maxLevel(_maxLevel), maxChannel(_maxChannel), q(q) {
 		minLevel = 1000;
 		realMax = 0;
 		this->block_size = _block_size;
 	}
 
 
-	void JoinSubimage::add(DwtImage dwt) {
+	/**
+	 * add new block
+	 * @param dwt
+	 */
+	void add(DwtImage dwt) {
 		//cout << "Bands: " << (int)dwt.getTypeSubBands() << " Level: " << dwt.getLevel() << " Channel: " << dwt.getChannel() << endl;
 		storage.push_back(dwt);
 		if (dwt.getLevel() < minLevel) {
@@ -63,11 +110,18 @@ public:
 			realMax = dwt.getLevel();
 		}
 	}
-	int JoinSubimage::size() {
+	int size() {
 		return storage.size();
 	}
 
-	cv::Mat JoinSubimage::joinContur(std::vector<cv::Mat> input, int height2, int width2) {
+	/**
+	 * join conturlet
+	 * @param input
+	 * @param height2
+	 * @param width2
+	 * @return - image
+	 */
+	cv::Mat joinContur(std::vector<cv::Mat> input, int height2, int width2) {
 		cv::Mat result = cv::Mat(height2, width2, CV_32FC1);
 		//cout << "in highH: " << height2 << " highW: " << width2 << endl;
 		/*for (int i = 0; i < input.size(); i++) {
@@ -107,7 +161,12 @@ public:
 		return result;
 	}
 
-	cv::Mat JoinSubimage::getJoinImage2(vector<int> info) {
+	/**
+	 * get join image without subblock
+	 * @param info
+	 * @return
+	 */
+	cv::Mat getJoinImage2(vector<int> info) {
 		int lowWidth = info[0];
 		int lowHeight = info[1];
 		int highW = info[2];
@@ -191,8 +250,11 @@ public:
 	
 	}
 
-
-	cv::Mat JoinSubimage::getJoinImage() {
+	/**
+	 * get join image by dwt sizes
+	 * @return - join image
+	 */
+	cv::Mat getJoinImage() {
 		cv::Mat result;
 		if (maxChannel == 3) {
 			result = cv::Mat(height, width, CV_32FC3);
@@ -201,6 +263,15 @@ public:
 			result = cv::Mat(height, width, CV_32FC1);
 		}
 
+		if(q){
+		for(int i = 0; i < storage.size(); i++) {
+			DwtImage dwt = storage[i];
+			cv::Mat edit = quant(dwt.getImage(),dwt.getLevel(),dwt.getMaxLevel());
+			storage[i].setImage(edit);
+		}
+
+		}
+		
 		joinEqually();
 
 		//DwtImage dwt;
@@ -282,8 +353,23 @@ private:
 	int minLevel;
 	int realMax;
 	int block_size;
+	int q;
 
-	std::vector<cv::Mat> JoinSubimage::getByLevelAndChannel(std::vector<DwtImage> input, int level, int channel) {
+	cv::Mat quant(cv::Mat mat, int level, int maxLevel) {
+		cv::Mat result = mat.clone();
+
+		result *= (1.25*(level+1));
+
+		return result;
+	}
+	/**
+	 * getByLevelAndChannel
+	 * @param input
+	 * @param level
+	 * @param channel
+	 * @return - vector cv::Mat
+	 */
+	std::vector<cv::Mat> getByLevelAndChannel(std::vector<DwtImage> input, int level, int channel) {
 		std::vector<cv::Mat> result;
 
 		for (int i = 0; i < input.size(); i++) {
@@ -296,7 +382,11 @@ private:
 		return result;
 	}
 
-	void JoinSubimage::clear(DwtImage find) {
+	/**
+	 * clear find in storage
+	 * @param find
+	 */
+	void clear(DwtImage find) {
 		std::vector<DwtImage> temp;
 		for (int i = 0; i < storage.size(); i++) {
 			if (find.getTypeSubBands() == storage[i].getTypeSubBands() &&
@@ -312,7 +402,10 @@ private:
 		this->storage = temp;
 	}
 
-	void JoinSubimage::joinEqually() {
+	/**
+	 * join subblock
+	 */
+	void joinEqually() {
 		//cout << "size: " << storage.size() << endl;
 		while (1) {
 			std::vector<DwtImage> temp;
@@ -354,7 +447,14 @@ private:
 		}
 	}
 
-	DwtImage JoinSubimage::get(Bands band, int level, int channel) {
+	/**
+	 * get block by band and level and channel
+	 * @param band
+	 * @param level
+	 * @param channel
+	 * @return
+	 */
+	DwtImage get(Bands band, int level, int channel) {
 		//cout << "Bands: " << (int)band << " Level: " << level << " Channel: " << channel << endl;
 		for (int i = 0; i < storage.size(); i++) {
 			DwtImage val = storage[i];

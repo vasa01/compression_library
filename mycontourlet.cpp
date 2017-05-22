@@ -1,7 +1,34 @@
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+
+/**
+ * @file	mycontourlet.cpp
+ *
+ * @brief	Mycontourlet implementation.
+*/
 #include "mycountourlet.hpp"
 
 
-
+/**
+ * MyContourlet
+ * @param contourlet
+ */
 MyContourlet::MyContourlet(contourlet_t *contourlet) {
 	this->ct_levels = contourlet->ct_levels;
 	this->wt_levels = contourlet->wt_levels;
@@ -29,6 +56,12 @@ MyContourlet::MyContourlet(contourlet_t *contourlet) {
 
 }
 
+/**
+ * MyContourlet
+ * @param _high - high cv::Mat
+ * @param _low - low cv::Mat
+ * @param ct_levels - int level
+ */
 MyContourlet::MyContourlet(std::vector<std::vector<cv::Mat>> _high, cv::Mat _low, int ct_levels) {
 	this->ct_levels = ct_levels;
 	this->low = _low.clone();
@@ -44,6 +77,12 @@ MyContourlet::MyContourlet(std::vector<std::vector<cv::Mat>> _high, cv::Mat _low
 
 }
 
+/**
+ * MyContourlet
+ * @param _high - high Matrix
+ * @param _low - low Matrix
+ * @param ct_levels - int level
+ */
 MyContourlet::MyContourlet(std::vector<std::vector<Matrix>> _high, Matrix _low, int ct_levels) {
 	this->ct_levels = ct_levels;
 	this->low = _low.getCvMat();
@@ -59,6 +98,11 @@ MyContourlet::MyContourlet(std::vector<std::vector<Matrix>> _high, Matrix _low, 
 
 }
 
+/**
+ * getBlocks for encode
+ * @param block_size
+ * @return - vector DwtImage
+ */
 vector<DwtImage*> MyContourlet::getBlocks(int block_size) {
 	vector<DwtImage*> vectorImages2;
 	
@@ -122,6 +166,10 @@ vector<DwtImage*> MyContourlet::getBlocks(int block_size) {
 	return vectorImages2;
 }
 
+/**
+ * Get struct countourlet_t
+ * @return - countourlet_t
+ */
 contourlet_t * MyContourlet::getStruct() {
 	//cout << "get struct" << endl;
 	contourlet_t *ct;

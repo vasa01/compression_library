@@ -318,7 +318,7 @@ imat imat_set_between(imat m, idx_t r1, idx_t c1, idx_t r2,
 }
 
 
-bmat bmat_set_between(bmat m, idx_t r1, idx_t c1, idx_t r2,
+bmat bmat_set_between2(bmat m, idx_t r1, idx_t c1, idx_t r2,
 	idx_t c2, byte val) {
 	Mat_set_between(m, r1, c1, r2, c2, val);
 	return m;

@@ -1,3 +1,27 @@
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+/**
+ * @file	bitIOStream.hpp
+ *
+ * @brief	bit stream.
+ */
+
 #ifndef BITIOSTREAM_H
 #define BITIOSTREAM_H
 
@@ -12,7 +36,9 @@
 #include <vector>
 
 ///using namespace std;
-
+/**
+ * class BitInputStream
+ */
 class BitInputStream {
 	InputStream* in;
 	std::istream* inStream;
@@ -20,12 +46,20 @@ class BitInputStream {
 	int buffer;
 	bool iStream;
 public:
+	/**
+	 * BitInputStream create
+	 * @param _in
+	 */
 	BitInputStream(InputStream* _in) {
 		in = _in;
 		bit_count = 0;
 		buffer = 0;
 		iStream = false;
 	};
+	/**
+	 * BitInputStream create
+	 * @param _in
+	 */
 	BitInputStream(std::istream* _in) {
 		inStream = _in;
 		bit_count = 0;
@@ -33,6 +67,10 @@ public:
 		iStream = true;
 	};
 
+	/**
+	 * get_bit
+	 * @return  - bit
+	 */
 	int get_bit() {
 		if(bit_count == 0) {
 			if (iStream) {
@@ -51,6 +89,11 @@ public:
 		return bit;
 	}
 
+	/**
+	 * get_bits
+	 * @param size  - size of read bits
+	 * @return - bits number
+	 */
 	unsigned long get_bits(const int size) { /* read #size bits from input */
 		unsigned long value = 0;
 		for(int i = 0; i < size; i++) {
@@ -61,7 +104,9 @@ public:
 	}   
 
 	};
-
+/**
+ * class BitOutputStream
+ */
 class BitOutputStream {
 	OutputStream* out;
 	std::ostream* outStream;
@@ -71,6 +116,10 @@ class BitOutputStream {
 	int64_t bitStreamLen;
 	bool osStream;
 public:
+	/**
+	 * BitOutputStream
+	 * @param _out
+	 */
 	BitOutputStream(OutputStream* _out) {
 		out = _out;
 		bit_count = 0;
@@ -78,6 +127,10 @@ public:
 		bitStreamLen = 0;
 		osStream = false;
 	}
+	/**
+	 * BitOutputStream
+	 * @param _out
+	 */
 	BitOutputStream(std::ostream* _out) {
 		outStream = _out;
 		bit_count = 0;
@@ -86,10 +139,18 @@ public:
 		osStream = true;
 	}
 
+	/**
+	 * getActualLen
+	 * @return - buffer size
+	 */
 	int64_t getActualLen() {
 		return bitStreamLen;
 	}
 
+	/**
+	 * put_bit
+	 * @param bit
+	 */
 	void put_bit(int bit) {
 		//cout << "i " << bit << " bit_count " << bit_count << endl;
 		bitStreamLen++;
@@ -107,16 +168,27 @@ public:
 			buffer = 0;
 		}
 	}
+	/**
+	 * put_bits
+	 * @param bits
+	 * @param size
+	 */
 	void put_bits(const unsigned long bits, const int size) {/* write #size bits to output */
 		for(int i = size - 1; i >= 0; i--)
 			put_bit((bits >> i) & 1);
 	}
-  
+
+	/**
+	 * flush_bits
+	 */
 	void flush_bits() {
 		while(bit_count > 0)
 			put_bit(0);
 	}
 
+	/**
+	 * flush
+	 */
 	void flush() { 
 		flush_bits(); 
 		if (osStream) {

@@ -1,19 +1,43 @@
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+
+/**
+ * @file	block_coder.hpp
+ *
+ * @brief	Implements block coder init table .
+ */
+
 #ifndef BLOCK_CODER_H
 #define	BLOCK_CODER_H
 
-//#include <SDL/SDL_stdinc.h>
-//
 #include <stdint.h>
 #include <algorithm>
 #include <iostream>
 #include <string>
 #include "tool.hpp"
 
-/**Base class for a JPEG2000 block coder (T1 coder)*/
+/**
+ * class block_coder
+ */
 class block_coder {
 public:
 
-	/**Subband of a Discrete Wavelet Transform*/
 	enum subband_t {
 		LL = 0,
 		LH,
@@ -23,12 +47,11 @@ public:
 		};
 
 protected:
-
+	/**
+	 * create block_coder
+	 */
 	block_coder() { }
 
-	/**The per-sample state flags
-	* @attention The order is important for the sign coding context lut!
-	*/
 	enum FLAGS {
 		//
 		/**Northeast neighbor was found to be significant*/

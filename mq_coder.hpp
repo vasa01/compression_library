@@ -2,7 +2,7 @@
 #define	MQ_CODER_H
 
 #include <vector>
-
+#include <stdint.h>
 
 class mq_coder {
 protected:

@@ -1,3 +1,28 @@
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+
+/**
+ * @file	mq_encoder2.hpp
+ *
+ * @brief	mq encoder implementation.
+ */
+
 #ifndef MQ_CODING_H
 #define	MQ_CODING_H
 
@@ -7,21 +32,30 @@
 #include "mq_coder.hpp"
 #include <iostream>
 
-/** Implementation of the MQ arithmetic coder as described in the JPEG2000 standard.*/
+/**
+ * class MQ_Encoder
+ */
 class MQ_Encoder: public mq_coder {
 public:
 
-	/**Creates a new MQ_Encoder*/
 	MQ_Encoder();
 
-	/**Creates a new MQ_Encoder*/
+	/**
+	 *
+	 * @param _buf - pointer output buffer
+	 * @param max_len - max_len output buffer
+	 */
 	MQ_Encoder(uint8_t *_buf, const int32_t& max_len);
 
-	/** todo
-	* Remember to call flush() before all intermediate data gets deleted!
-	*/
+	/**
+	 *
+	 */
 	void reset();
 
+	/**
+	 * get_buffer
+	 * @return  - buffer
+	 */
 	std::vector<uint8_t>  get_buffer() {
 		std::vector<uint8_t> buf;
 		for(int i = 0; i < this->get_data_len(); i++) {

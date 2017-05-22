@@ -1,4 +1,27 @@
-#pragma once
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+/**
+ * @file	bitIOStream.hpp
+ *
+ * @brief	bit stream.
+ */
+
 #ifndef BITSTREAM_H
 #define BITSTREAM_H
 
@@ -7,17 +30,27 @@
 #include <stdexcept>
 
 //using namespace std;
-
+/**
+ * class BitStreamRead
+ */
 class BitStreamRead {
 public:
-	BitStreamRead::BitStreamRead(std::istream* stream):byte(0),mask(0),stream(stream) {
+	BitStreamRead(std::istream* stream):byte(0),mask(0),stream(stream) {
 	}
-	void BitStreamRead::reset(std::istream* stream){
+	/**
+	 * reset
+	 * @param stream
+	 */
+	void reset(std::istream* stream){
 		this->byte=0;
 		this->mask=0;
 		this->stream = stream;
 	}
-	bool BitStreamRead::bitStreamRead() {
+	/**
+	 * bitStreamRead
+	 * @return
+	 */
+	bool bitStreamRead() {
 		if(mask == 0) {
 			if(!stream->read(reinterpret_cast<char*>(&byte), 1))
 				throw std::runtime_error("Unable to read from stream!");
@@ -36,11 +69,11 @@ private:
 
 class BitStreamWrite {
 public:
-	BitStreamWrite::BitStreamWrite(std::ostream* stream):byte(0), mask(0x80), stream(stream) {
+	BitStreamWrite(std::ostream* stream):byte(0), mask(0x80), stream(stream) {
 
 	}
 	
-	void BitStreamWrite::reset(std::ostream* stream) {
+	void reset(std::ostream* stream) {
 		this->byte = 0;
 		this->mask = 0x80;
 		this->stream = stream;
@@ -50,7 +83,7 @@ public:
 		flush();
 	}
 
-	void BitStreamWrite::flush() {
+	void flush() {
 		if(mask != 0x80) {
 			stream->put(byte);
 			byte = 0;
@@ -58,7 +91,7 @@ public:
 		}
 	}
 
-	void BitStreamWrite::writeBit(bool bit) {
+	void writeBit(bool bit) {
 		// set bit if we should
 		if(bit)
 			byte |= mask;

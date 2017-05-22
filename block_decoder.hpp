@@ -1,10 +1,38 @@
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+
+/**
+ * @file	block_decoder.hpp
+ *
+ * @brief	Implements block coder init table .
+*/
 #ifndef BLOCK_DECODER_H
 #define	BLOCK_DECODER_H
 
-//#include "common/bivector.h"
+#include "bivector.hpp"
 #include "block_coder.hpp"
 #include "mq_decoder2.hpp"
 
+/**
+ * class block_decoder
+ * @tparam T
+ */
 template<typename T>
 class block_decoder: public block_coder {
 public:
@@ -26,11 +54,25 @@ protected:
 
 	inline void sign_coding(bivector<T>& block, const int& x, const int& y);
 	};
-
+/**
+ * create block_decoder
+ * @tparam T
+ * @param _block_size
+ */
 template<typename T>
 block_decoder<T>::block_decoder(const MyVector2i& _block_size)
 	: block_size(_block_size), states(block_size.x() + 2, block_size.y() + 2) { }
 
+/**
+ * decode block
+ * @tparam T
+ * @param buffer
+ * @param buflen
+ * @param planes
+ * @param block
+ * @param band
+ * @param min
+ */
 template<typename T>
 void block_decoder<T>::decode(uint8_t* buffer, const int32_t& buflen, const uint8_t& planes, bivector<T>& block, const subband_t& band, int min) {
 
@@ -44,6 +86,12 @@ void block_decoder<T>::decode(uint8_t* buffer, const int32_t& buflen, const uint
 	}
 }
 
+/**
+ * cleanUpPass
+ * @tparam T
+ * @param block
+ * @param band
+ */
 template<typename T>
 void block_decoder<T>::cleanUpPass(bivector<T>& block, const subband_t& band) {
 	for(int section = 0; section < block_size.y(); section += 4) {
@@ -98,7 +146,12 @@ void block_decoder<T>::cleanUpPass(bivector<T>& block, const subband_t& band) {
 			}
 		}
 	}
-
+/**
+ * sigifiancePropagationPass
+ * @tparam T
+ * @param block
+ * @param band
+ */
 template<typename T>
 void block_decoder<T>::sigifiancePropagationPass(bivector<T>& block, const subband_t& band) {
 	for(int section = 0; section < block_size.y(); section += 4) {
@@ -123,6 +176,11 @@ void block_decoder<T>::sigifiancePropagationPass(bivector<T>& block, const subba
 		}
 	}
 
+/**
+ * magnitudeRefinementPass
+ * @tparam T
+ * @param block
+ */
 template<typename T>
 void block_decoder<T>::magnitudeRefinementPass(bivector<T>& block) {
 	for(int section = 0; section < block_size.y(); section += 4) {
@@ -143,6 +201,13 @@ void block_decoder<T>::magnitudeRefinementPass(bivector<T>& block) {
 		}
 	}
 
+/**
+ * sign_coding
+ * @tparam T
+ * @param block
+ * @param x
+ * @param y
+ */
 template<typename T>
 void block_decoder<T>::sign_coding(bivector<T>& block, const int& x, const int& y) {
 	uint16_t& state = states.at(x + 1, y + 1);

@@ -44,7 +44,7 @@ static char it_printf_mat_default_fmt[it_fmt_max_length + 1] = "$9.3lf";
 void it_set_vec_default_fmt(char *fmt)
 {
 	assert(strlen(fmt) < it_fmt_max_length);
-	strcpy_s(it_printf_vec_default_fmt, fmt);
+	strcpy(it_printf_vec_default_fmt, fmt);
 }
 
 
@@ -52,7 +52,7 @@ void it_set_vec_default_fmt(char *fmt)
 void it_set_mat_default_fmt(char *fmt)
 {
 	assert(strlen(fmt) < it_fmt_max_length);
-	strcpy_s(it_printf_vec_default_fmt, fmt);
+	strcpy(it_printf_vec_default_fmt, fmt);
 }
 
 
@@ -289,7 +289,7 @@ void it_vfprintf(FILE * output, char *fmt, va_list ap)
 
 			switch (*fmt) {
 			case 'v':		/* Default representation of the vector. Other format are ignored */
-				strcpy_s(fmt_opt, it_printf_vec_default_fmt);
+				strcpy(fmt_opt, it_printf_vec_default_fmt);
 			case 'f':
 			case 'g':
 				v = va_arg(ap, vec);
@@ -424,7 +424,7 @@ void it_vfprintf(FILE * output, char *fmt, va_list ap)
 
 			switch (*fmt) {
 			case 'm':		/* Default representation of the matrix. Other format are ignored */
-				strcpy_s(fmt_opt, it_printf_mat_default_fmt);
+				strcpy(fmt_opt, it_printf_mat_default_fmt);
 			case 'f':
 			case 'g':
 				m = va_arg(ap, mat);
@@ -515,7 +515,7 @@ char *it_read_double(char *s, double *p_val)
 	buf[nb_char_number] = '\0';
 	strncpy(buf, s, nb_char_number);
 
-	sscanf_s(buf, "%lf", p_val);
+	sscanf(buf, "%lf", p_val);
 	free(buf);
 	return s + nb_char_not_delim;
 }

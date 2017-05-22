@@ -1,3 +1,28 @@
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+
+/**
+ * @file	ariDecode.hpp
+ *
+ * @brief	arithmetic decoder.
+ */
+
 #ifndef ARIDECODE_H
 #define ARIDECODE_H
 
@@ -9,11 +34,13 @@
 
 
 
-
+/**
+ * Class ARIDecode
+ */
 class ARIDecode {
 public:
-	ARIDecode::ARIDecode(BitInputStream* bst, const unsigned symbols);
-	unsigned ARIDecode::decode();
+	ARIDecode(BitInputStream* bst, const unsigned symbols);
+	unsigned decode();
 
 private:
 
@@ -27,6 +54,9 @@ private:
 	void readBit();
 	typedef IntervalTraits<4> IntervalTraitsType;
 
+	/**
+	 * printCumulativ
+	 */
 	void printCumulativ() {
 		for(int i = 0; i < cumulativeFreqs.size(); i++) {
 			cout << " [" << i << "] value: " << cumulativeFreqs[i];
@@ -34,7 +64,12 @@ private:
 			}
 		cout << endl;
 	}
-	
+
+	/**
+	 * getCumulativeFreq
+	 * @param symbol
+	 * @return
+	 */
 	unsigned getCumulativeFreq(unsigned symbol) const {
 		//assert(symbol < cumulativeFreqs.size());
 		if(symbol >= cumulativeFreqs.size()) {
@@ -43,7 +78,12 @@ private:
 			}
 		return cumulativeFreqs[symbol];
 	}
-	
+
+	/**
+	 * incSymbolFreq
+	 * @param symbol
+	 * @param freq
+	 */
 	void incSymbolFreq(unsigned symbol, unsigned freq = 1) {
 		bool overflow = false;
 		for(auto i = symbol; i < cumulativeFreqs.size(); ++i) {

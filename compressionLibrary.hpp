@@ -1,6 +1,8 @@
 #ifndef COMPRESSION_LIBRARY_H
 #define COMPRESSION_LIBRARY_H
 
+//#define _GLIBCXX_USE_CXX11_ABI 0
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -54,7 +56,6 @@
 #include "save_mat.hpp"
 #include "mycountourlet.hpp"
 
-#include "mq_new.hpp"
 
 #include "block_encoder.hpp"
 #include "block_decoder.hpp"
@@ -252,7 +253,8 @@ static cv::Mat ConvertYCbCr2BGR(cv::Mat src) {
 
 
 
-cv::Mat decompresFile(string inputSource, string outputSource);
-void compresFile(string inputSource, string outputSource, COMPR_LBR::COLOR_SPACE_TYPE codeColorType, COMPR_LBR::TRANS_TYPE transType, COMPR_LBR::LEVEL_NUM levelNum, COMPR_LBR::CODE_TYPE codeType, vector<bool> set, vector<int> setValue, int block_size);
+
+cv::Mat decompresFile(std::string inputSource, std::string outputSource);
+void compresFile(std::string inputSource, std::string outputSource, COMPR_LBR::COLOR_SPACE_TYPE codeColorType, COMPR_LBR::TRANS_TYPE transType, COMPR_LBR::LEVEL_NUM levelNum, COMPR_LBR::CODE_TYPE codeType, vector<bool> set, vector<int> setValue, int block_size, int quant);
 
 #endif

@@ -1,8 +1,26 @@
-/**********************************************************************************************//**
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+/**
  * @file	cdf97.cpp
  *
  * @brief	Implements the cdf 97 class.
- **************************************************************************************************/
+ */
 
 #include "cdf97.hpp"
 
@@ -11,19 +29,13 @@
 
 #define DWT_VISUAL 0
 
-/**********************************************************************************************//**
- * @fn	CDF97::CDF97(int level, Mat& image)
- *
- * @brief	Constructor.
- *
- * @author	Vasa 0
- * @date	06.01.2017
- *
- * @param 		  	level	The level.
- * @param [in,out]	image	The image.
- **************************************************************************************************/
-
-CDF97::CDF97(int level, cv::Mat& image, int block_size){
+/**
+ * @fn CDF97
+ * @param level - the level of wavelet
+ * @param image - input image
+ * @param block_size - block size for EBCOT
+ */
+CDF97::CDF97(int level, cv::Mat& image, int quant, int block_size){
 	if(level == 0) {
 		level = log10(image.cols) / log10(2.0);
 	}
@@ -31,35 +43,24 @@ CDF97::CDF97(int level, cv::Mat& image, int block_size){
 	this->image = image;
 	this->block_size = block_size;
 	this->countChannels = image.channels();
+	this->quant = quant;
 }
 
-/**********************************************************************************************//**
- * @fn	DwtLevels* CDF97::getLevelsObject()
- *
- * @brief	Gets levels object.
- *
- * @author	Vasa 0
- * @date	06.01.2017
- *
- * @return	Null if it fails, else the levels object.
- **************************************************************************************************/
+/**
+ *	@fn getLevelsObject
+ * @return DwtLevels object
+ */
 
 DwtLevels* CDF97::getLevelsObject() {
 	return dwtLevels;
 }
 
-/**********************************************************************************************//**
- * @fn	void CDF97::predict(Line<float> line, double coef1, double coef2)
- *
- * @brief	Predicts.
- *
- * @author	Vasa 0
- * @date	06.01.2017
- *
- * @param	line 	The line.
- * @param	coef1	The first coef.
- * @param	coef2	The second coef.
- **************************************************************************************************/
+/**
+ * @fn predict
+ * @param line - input line signal
+ * @param coef1
+ * @param coef2
+ */
 
 void CDF97::predict(Line<float> line, double coef1, double coef2){
 	/*for(size_t i = 1;i< line.size() -2 ;i = i+2){
@@ -76,18 +77,11 @@ void CDF97::predict(Line<float> line, double coef1, double coef2){
 		line[line.size() - 1] -= 2 * coef1 * line[line.size() - 2];
 }
 
-/**********************************************************************************************//**
- * @fn	void CDF97::update(Line<float> line, double coef)
- *
- * @brief	Updates this object.
- *
- * @author	Vasa 0
- * @date	06.01.2017
- *
- * @param	line	The line.
- * @param	coef	The coef.
- **************************************************************************************************/
-
+/**
+ * void CDF97::update(Line<float> line, double coef){
+ * @param line - input line signal
+ * @param coef
+ */
 void CDF97::update(Line<float> line, double coef){
 	/*for(size_t i = 2;i< line.size();i = i+2){
 		line[i] += coef * ( line[i-1] + line[i+1]);
@@ -100,19 +94,11 @@ void CDF97::update(Line<float> line, double coef){
 	for (int i = 2; i<line.size()- (line.size() & 1); i += 2)
 		line[i] += coef * (line[i - 1] + line[i + 1]);
 
+
 }
-
-/**********************************************************************************************//**
- * @fn	void CDF97::forward(Line<float> line)
- *
- * @brief	Forwards the given line.
- *
- * @author	Vasa 0
- * @date	06.01.2017
- *
- * @param	line	The line.
- **************************************************************************************************/
-
+/**
+ * @param line - input line signal
+ */
 void CDF97::forward(Line<float> line){
 	assert(line.size() % 2 == 0);
 
@@ -127,7 +113,7 @@ void CDF97::forward(Line<float> line){
 	tempbank.resize(line.size());
 	
 
-	double scale = 1.0f / k1;
+	double scale = 1.0f / k1_0;
 	for (size_t i = 0; i < line.size(); ++i) {
 		if (i % 2) {
 			line[i] *= scale;
@@ -143,23 +129,15 @@ void CDF97::forward(Line<float> line){
 	}
 }
 
-/**********************************************************************************************//**
- * @fn	void CDF97::inverse(Line<float> line)
+/**
  *
- * @brief	Inverses the given line.
- *
- * @author	Vasa 0
- * @date	06.01.2017
- *
- * @param	line	The line.
- **************************************************************************************************/
-
+ */
 void CDF97::inverse(Line<float> line) {
 	assert(line.size() % 2 == 0);
 
 	tempbank.resize(line.size());
 
-	double scale = k1;
+	double scale = k1_0;
 	for (size_t i = 0; i < line.size() / 2; i++) {
 		tempbank[i * 2] = line[i] / scale;
 		tempbank[i * 2 + 1] = line[i + line.size() / 2] * scale;
@@ -183,7 +161,7 @@ void CDF97::inverse2(Line<float> line) {
 
 	tempbank.resize(line.size());
 
-	double scale = k1;
+	double scale = k1_0;
 	for (size_t i = 0; i < line.size() / 2; i++) {
 		tempbank[i * 2] = line[i] / scale;
 		tempbank[i * 2+1] = line[i] / scale+1;
@@ -213,7 +191,9 @@ void CDF97::inverse2(Line<float> line) {
  *
  * @param	line	The line.
  **************************************************************************************************/
-
+/**
+ *
+ */
 void printLine(Line<float> line){
 	for (size_t i = 0; i < line.size(); i++) {
 		if(i==0)
@@ -234,11 +214,13 @@ void printLine(Line<float> line){
  *
  * @param [in,out]	image	The image.
  **************************************************************************************************/
-
+/**
+ *
+ */
 void CDF97::forward2d(cv::Mat& image, bool check) {
 	//const int c = (int)image.channels();
 	if(!check){
-	this->dwtLevels = new DwtLevels(levels, countChannels, block_size);
+	this->dwtLevels = new DwtLevels(levels, countChannels, block_size, quant);
 	}
 	cv::Mat *channel = new cv::Mat[countChannels];
 	split(image, channel);
@@ -277,7 +259,7 @@ void CDF97::forward2d(cv::Mat& image, bool check) {
 			/*if (k == 1) {
 				cout << subImage << endl;
 			}*/
-			if(k == 0 && !check && false) {
+			/*if(k == 0 && !check && false) {
 				cout << k << endl;
 				std::vector<cv::Mat> save;
 				DwtImage dwt = DwtImage(subImage, k, c, levels, countChannels);
@@ -300,7 +282,7 @@ void CDF97::forward2d(cv::Mat& image, bool check) {
 
 				this->levels++;
 				this->countChannels = saveChannel;
-			}
+			}*/
 			if(!check) {
 				dwtLevels->setDwtImagesByLevelAndChannel(DwtImage(subImage, k, c, levels, countChannels));
 			}
@@ -330,7 +312,6 @@ void CDF97::forward2d(cv::Mat& image, bool check) {
  *
  * @param [in,out]	image	The image.
  **************************************************************************************************/
-
 void CDF97::inverse2d(cv::Mat& image, bool check) {
 	//const int c = (int)image.channels();
 	cv::Mat *channel = new cv::Mat[countChannels];
@@ -343,12 +324,12 @@ void CDF97::inverse2d(cv::Mat& image, bool check) {
 		cv::Mat unSubImage(channel[i], cv::Rect(cv::Point(0, 0), cv::Size(channel[i].cols / factor, channel[i].rows / factor)));
 		for (int i = 0; i < levels; ++i) {
 
-			if(i == levels - 1 && !check && false) {
+			/*if(i == levels - 1 && !check && false) {
 				cout << i << endl;
 				/*cv::Mat tmp2;
 				unSubImage.convertTo(tmp2, CV_8UC1);
 				imshow(Tool::IntToString(0) + "TMP2", tmp2);
-				cv::waitKey();*/
+				cv::waitKey();*/ /*
 				std::vector<cv::Mat> save;
 				DwtImage dwt = DwtImage(unSubImage, 1, 1, levels, countChannels);
 				std::vector<DwtImage*> vec = dwt.createBands();
@@ -370,7 +351,7 @@ void CDF97::inverse2d(cv::Mat& image, bool check) {
 
 				this->levels++;
 				this->countChannels = saveChannel;
-			}
+			}*/
 
 			cv::Mat transposed = unSubImage.t();
 			for (int i = 0; i < transposed.rows; ++i) {
@@ -437,7 +418,12 @@ double CDF97::diff(const Mat& test, const Mat& ref) {
  * @param [in,out]	sub  	The sub.
  * @param [in,out]	image	The image.
  **************************************************************************************************/
-
+/**
+ * @fn	void CDF97::getSubBands(vector<Mat>& sub, Mat& image)
+ * @brief	Gets sub bands.
+ * @param [in,out]	sub  	The sub.
+ * @param [in,out]	image	The image.
+ */
 void CDF97::getSubBands(vector<cv::Mat>& sub, cv::Mat& image) {
 
 	cv::Mat LL(image, cv::Rect(0, 0, image.cols / 2, image.rows / 2));
@@ -564,6 +550,6 @@ double CDF97::test(){
 	cv::Mat inverse = cv::imread("./invers.bmp" , CV_LOAD_IMAGE_COLOR);
 	cout<<"diff image: "<<Tool::Diff(inverse,orgImage2)<<endl;
 	return 0;//Tool::Diff(image,orgImage);
-}
+};
 
 

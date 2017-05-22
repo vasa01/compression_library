@@ -1,8 +1,27 @@
-/**********************************************************************************************//**
- * @file	line.hpp
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
  *
- * @brief	Declares the line class.
- **************************************************************************************************/
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+
+/**
+ * @file	line.cpp
+ *
+ * @brief	Line implementation.
+ */
 
 #ifndef LINE_H
 #define LINE_H
@@ -14,20 +33,13 @@
 #include <stdint.h>
 #include <fstream>
 #include <string>
+#include <vector>
+#include <cassert>
 
-//using namespace std;
-
-/**********************************************************************************************//**
- * @class	Line
- *
- * @brief	A line.
- *
- * @author	Vasa 0
- * @date	06.01.2017
- *
- * @tparam	T	Generic type parameter.
- **************************************************************************************************/
-
+/**
+ * class Line
+ * @tparam T
+ */
 template <typename T>
 class Line
 {
@@ -36,88 +48,45 @@ public:
 	typedef T* pointer;
 	typedef size_t size_type;
 
-	/**********************************************************************************************//**
-	 * @fn	Line::Line(pointer ptr, size_type n)
-	 *
-	 * @brief	Constructor.
-	 *
-	 * @author	Vasa 0
-	 * @date	06.01.2017
-	 *
-	 * @param	ptr	The pointer.
-	 * @param	n  	The size_type to process.
-	 **************************************************************************************************/
 
+	/**
+	 * create line obj from pointer to len
+	 * @param ptr - pointer
+	 * @param n - len
+	 */
 	Line(pointer ptr, size_type n) : ptr(ptr), n(n) { }
 
-	/**********************************************************************************************//**
-	 * @fn	Line::Line(vector<T>& vec)
-	 *
-	 * @brief	Constructor.
-	 *
-	 * @author	Vasa 0
-	 * @date	06.01.2017
-	 *
-	 * @param [in,out]	vec	The vector.
-	 **************************************************************************************************/
+	/**
+	 * create Line from vector
+	 * @param vec
+	 */
+	Line(std::vector<T> &vec) : ptr(vec.data()), n(vec.size()) { }
 
-	Line(std::vector<T>& vec) : ptr(vec.data()), n(vec.size()) { }
 
-	/*pointer data() {
-		return ptr;
-	}
-
-	const pointer data() const {
-		return ptr;
-	}
-	*/
-
-	/**********************************************************************************************//**
-	 * @fn	size_type size() const
-	 *
-	 * @brief	Gets the size.
-	 *
-	 * @author	Vasa 0
-	 * @date	06.01.2017
-	 *
-	 * @return	A size_type.
-	 **************************************************************************************************/
-
+	/**
+	 * size
+	 * @return size line
+	 */
 	size_type size() const {
 		return n;
 	}
 
-	/**********************************************************************************************//**
-	 * @fn	value_type& operator[](size_type i)
-	 *
-	 * @brief	Array indexer operator.
-	 *
-	 * @author	Vasa 0
-	 * @date	06.01.2017
-	 *
-	 * @param	i	Zero-based index of the.
-	 *
-	 * @return	The indexed value.
-	 **************************************************************************************************/
-
+	/**
+	 * operator []
+	 * @param i
+	 * @return values type
+	 */
 	value_type& operator[](size_type i) {
 		assert(i < n);
 		return ptr[i];
 	}
 
-	/**********************************************************************************************//**
-	 * @fn	const value_type& operator[](size_type i) const
-	 *
-	 * @brief	Array indexer operator.
-	 *
-	 * @author	Vasa 0
-	 * @date	06.01.2017
-	 *
-	 * @param	i	Zero-based index of the.
-	 *
-	 * @return	The indexed value.
-	 **************************************************************************************************/
 
+	/**
+	 *
+	 * @param i
+	 * @return value
+	 */
 	const value_type& operator[](size_type i) const {
 		assert(i < n);
 		return ptr[i];

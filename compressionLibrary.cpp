@@ -1,8 +1,46 @@
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+/**
+ * @file	compressionLibrary.cpp
+ *
+ * @brief	Implements compressionLibrary.
+ */
+
 #include "compressionLibrary.hpp"
-
+/**
+ * namespace COMPR_LBR
+ */
 using namespace COMPR_LBR;
-
-	void compresFile(string inputSource, string outputSource, COLOR_SPACE_TYPE codeColorType, TRANS_TYPE transType, LEVEL_NUM levelNum, CODE_TYPE codeType, vector<bool> set, vector<int> setValue, int block_size) {
+	/**
+	 * compress file
+	 * @param inputSource - input source file
+	 * @param outputSource - output source file
+	 * @param codeColorType  - RGB, YCbCr
+	 * @param transType - CDF97, CDF53 , Conturlet
+	 * @param levelNum - level num
+	 * @param codeType - code type EZW, SPIHT, EBCOT
+	 * @param set - param set bool
+	 * @param setValue - param set value
+	 * @param block_size - in ebcot block size
+	 * @param quant - quant set
+	 */
+	void compresFile(std::string inputSource, std::string outputSource, COLOR_SPACE_TYPE codeColorType, TRANS_TYPE transType, LEVEL_NUM levelNum, CODE_TYPE codeType, vector<bool> set, vector<int> setValue, int block_size, int quant) {
 		//bool pokus = false;
 		//cout << "size in KB: "<< kilobytes << "KB" << endl;
 		//double rate = procent*0.01;
@@ -10,8 +48,8 @@ using namespace COMPR_LBR;
 		int maxChannel;
 		int tilesSize=0;
 		
-		CDF97 *cdf97 = new CDF97(levelNum, image);
-		CDF53 *cdf53 = new CDF53(levelNum, image);
+		CDF97 *cdf97 = new CDF97(levelNum, image, quant);
+		CDF53 *cdf53 = new CDF53(levelNum, image, quant);
 		
 		MyContourlet mycontourlet;
 		std::vector<MyContourlet> contur;
@@ -44,6 +82,9 @@ using namespace COMPR_LBR;
 			block_size = image.cols;
 		}
 
+
+		
+
 		bool threeChanels = image.channels() == 3 ? 1 : 0;
 		cv::Mat coloredMat;
 		if (threeChanels) {
@@ -67,13 +108,15 @@ using namespace COMPR_LBR;
 				coloredMat = image.clone();
 			}
 		}
+		
+		
 		//std::cout << "<<< ColorSpace modul done!" << endl;
 		if (transType == TRANS_TYPE::DWT_CDF97) {
 			//************ CDF 9/7 ***********************//
 			//std::cout << ">>> Cdf 9 / 7 begin" << endl;
 			maxChannel = coloredMat.channels();
 
-			cdf97 = new CDF97(levelNum, coloredMat, block_size);
+			cdf97 = new CDF97(levelNum, coloredMat, quant, block_size);
 			cdf97->forward2d(coloredMat);
 			cv::Mat imageAfterCDF97 = cdf97->getForward();
 			imwrite("inverse_2.bmp", imageAfterCDF97);
@@ -86,7 +129,7 @@ using namespace COMPR_LBR;
 			std::cout << ">>> Cdf 5/3 begin" << endl;
 			maxChannel = coloredMat.channels();
 
-			cdf53 = new CDF53(levelNum, coloredMat, block_size);
+			cdf53 = new CDF53(levelNum, coloredMat,quant, block_size);
 			cdf53->forward2d(coloredMat);
 			cv::Mat imageAfterCDF53 = cdf53->getForward();
 			imwrite("inverse_2.bmp", imageAfterCDF53);
@@ -155,6 +198,7 @@ using namespace COMPR_LBR;
 			bout->put_bits(maxChannel, 6);
 			bout->put_bits(image.cols, 12);
 			bout->put_bits(image.rows, 12);
+			bout->put_bits(quant, 12);
 			sumInformData += 8 * 5 + 6 * 4 + 12 * 2;
 
 			cv::Mat *channel = new cv::Mat[maxChannel];
@@ -253,6 +297,7 @@ using namespace COMPR_LBR;
 			bout->put_bits(maxChannel, 6);
 			bout->put_bits(image.cols, 12);
 			bout->put_bits(image.rows, 12);
+			bout->put_bits(quant, 12);
 			//bout->put_bits(vectorImages.size(), 12);
 			sumInformData += 8 * 5 + 6 * 4 + 12 * 2;
 			if (transType == TRANS_TYPE::DWT_CDF97 || transType == TRANS_TYPE::DWT_CDF53) {
@@ -277,10 +322,10 @@ using namespace COMPR_LBR;
 					BitOutputStream* spihtOut = new BitOutputStream(&temp);
 
 					Matrix mat = Matrix(channel[ch], 1);
-					Matrix absMat = Tool::Abs(mat);
+					//Matrix absMat = Tool::Abs(mat);
 					//int32_t max = absMat.getMax();
-					int len = mat.getCountBits();//Tool::DecToBin(max).length();
-					int bits0 = (int)ceil(100*8000*0.33);// * (mat.w() * mat.h())
+					//int len = mat.getCountBits();//Tool::DecToBin(max).length();
+					int bits0 = (int)ceil(setValue[1]*8000*0.33);// * (mat.w() * mat.h())
 					spihtOut->put_bits(bits0, 29);
 					cout << "channel_" << ch << endl;
 					SPIHT_Encoder encode;
@@ -316,9 +361,9 @@ using namespace COMPR_LBR;
 					ostringstream temp;
 					BitOutputStream* spihtOut = new BitOutputStream(&temp);
 					///
-					int32_t maxCon = 0;
+					//int32_t maxCon = 0;
 					//int allWidth = 0, allHeight = 0;
-					double min, max;
+					/*double min, max;
 					std::vector<std::vector<cv::Mat>> high = contur[ch].getHigh();
 					cv::Mat low = contur[ch].getLow();
 					//allWidth += low.cols;
@@ -339,7 +384,7 @@ using namespace COMPR_LBR;
 						}
 
 					}
-					int len = Tool::DecToBin(maxCon).length();
+					int len = Tool::DecToBin(maxCon).length();*/
 					int bits0 = (int)ceil(setValue[1]*8000*0.33);
 					spihtOut->put_bits(bits0, 29);
 					cout << "channel_" << ch << endl;
@@ -461,6 +506,7 @@ using namespace COMPR_LBR;
 			bout->put_bits(maxChannel, 6);
 			bout->put_bits(image.cols, 12);
 			bout->put_bits(image.rows, 12);
+			bout->put_bits(quant, 12);
 			bout->put_bits(vectorImages.size(), 12);
 			bout->put_bits(block_size, 12);
 			//bout->put_bits(kilobytes, 12);
@@ -530,6 +576,7 @@ using namespace COMPR_LBR;
 				 
 					}
 					if(set[0] || set[2]) {
+						prev_info = last_info;
 						break;
 					}
 					if(set[1]){
@@ -585,15 +632,20 @@ using namespace COMPR_LBR;
 
 
 
-
-	cv::Mat decompresFile( string inputSource,  string outputSource) {
+	/**
+	 * decompresFile
+	 * @param inputSource
+	 * @param outputSource
+	 * @return image
+	 */
+	cv::Mat decompresFile( std::string inputSource,  std::string outputSource) {
 		cv::Mat result;
 
 		FileInputStream* fin = new FileInputStream(inputSource.c_str());
 		BitInputStream* bin = new BitInputStream(fin);
 
 
-		string code;
+		std::string code;
 		for (int i = 0; i < 5; i++) {
 			code.push_back((char)bin->get_bits(8));
 		}
@@ -606,6 +658,7 @@ using namespace COMPR_LBR;
 		int numChannel = bin->get_bits(6);
 		int fullWidth = bin->get_bits(12);
 		int fullHeight = bin->get_bits(12);
+		int quant = bin->get_bits(12);
 
 		std::cout << "Decomress" << endl;
 
@@ -705,7 +758,7 @@ using namespace COMPR_LBR;
 					int bits0 = input->get_bits(29);
 					spiht_dec->decode(0, bits0, input);
 					cout << endl;
-					channel[ch] = spiht_dec->getOutput(512).getCvMat();// decodeMat.getCvMatDequant(1000).clone();
+					channel[ch] = spiht_dec->getOutput(fullWidth, quant).getCvMat();// decodeMat.getCvMatDequant(1000).clone();
 				}
 				std::cout << "<<< SPIHT decoding done!" << endl;
 				if (numChannel == 3) {
@@ -788,7 +841,7 @@ using namespace COMPR_LBR;
 			}
 			
 			//std::cout << ">>>>>> EBCOT decoding begin" << endl;
-			JoinSubimage* join = new JoinSubimage(fullWidth, fullHeight, numLevel, numChannel, block_size);
+			JoinSubimage* join = new JoinSubimage(fullWidth, fullHeight, numLevel, numChannel, block_size, quant);
 		/*	vector<JoinSubimage*> joins;
 			for(int i = 0; i < tilesSize; i++) {
 				joins.push_back(new JoinSubimage(TILE_SIZE, TILE_SIZE, numLevel, numChannel));
@@ -829,7 +882,7 @@ using namespace COMPR_LBR;
 				//block.encode(bi, (block_coder::subband_t)vectorImages[i]->getTypeSubBands(), plane);
 				for(int xx = 0; xx < myvec.x(); xx++) {
 					for(int yy = 0; yy < myvec.y(); yy++) {
-						ma[cv::Point(xx,yy)] = bi.at(xx, yy) << min;
+						ma[cv::Point(xx,yy)] = (bi.at(xx, yy) << min);
 					}
 				}
 				
@@ -864,6 +917,7 @@ using namespace COMPR_LBR;
 			}
 			else if (trans_type == (int)TRANS_TYPE::CON) {
 				test = join->getJoinImage2(info_con);
+				
 				//cout << "join" << endl;
 				if (codeColorType == COLOR_SPACE_TYPE::YCBCR) {
 					test = ConvertYCbCr2BGR(test);
@@ -897,9 +951,10 @@ using namespace COMPR_LBR;
 				cerr << "Empty image" << endl;
 				}
 			//std::cout << result.channels() << endl;
-			CDF97 *cdf97 = new CDF97(numLevel, result);
+			CDF97 *cdf97 = new CDF97(numLevel, result, quant);
 			cdf97->inverse2d(result, 0);
 			result = cdf97->getInverse();
+			
 			//std::cout << "<<< Cdf 9 / 7 done!" << endl;
 			if(codeColorType == COLOR_SPACE_TYPE::YCBCR) {
 				result = ConvertYCbCr2BGR(result);
@@ -913,10 +968,11 @@ using namespace COMPR_LBR;
 				cerr << "Empty image" << endl;
 				}
 			//std::cout << result.channels() << endl;
-			CDF53 *cdf53 = new CDF53(numLevel, result);
+			CDF53 *cdf53 = new CDF53(numLevel, result, quant);
 			cdf53->inverse2d(result, 0);
 			result = cdf53->getInverse();
 			//std::cout << "<<< Cdf 5 / 3 done!" << endl;
+			
 			if(codeColorType == COLOR_SPACE_TYPE::YCBCR) {
 				result = ConvertYCbCr2BGR(result);
 				}

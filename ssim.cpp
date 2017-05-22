@@ -1,8 +1,40 @@
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+/**
+ * @file	ssim.cpp
+ *
+ * @brief	ssim implementation.
+ */
+
 #include "ssim.hpp"
 
 #define C1 (float) (0.01 * 255 * 0.01  * 255)
 #define C2 (float) (0.03 * 255 * 0.03  * 255)
 
+/**
+ * sigma calc
+ * @param m
+ * @param i
+ * @param j
+ * @param block_size
+ * @return
+ */
 double sigma(cv::Mat &m, int i, int j, int block_size)
 	{
 	double sd = 0;
@@ -21,7 +53,16 @@ double sigma(cv::Mat &m, int i, int j, int block_size)
 	return sd;
 	}
 
-// Covariance
+
+/**
+ * Covariance
+ * @param m1
+ * @param m2
+ * @param i
+ * @param j
+ * @param block_size
+ * @return
+ */
 double cov(cv::Mat &m1, cv::Mat &m2, int i, int j, int block_size){
 	cv::Mat m3 = cv::Mat::zeros(block_size, block_size, m1.depth());
 	cv::Mat m1_tmp = m1(cv::Range(i, i + block_size), cv::Range(j, j + block_size));
@@ -40,6 +81,10 @@ double cov(cv::Mat &m1, cv::Mat &m2, int i, int j, int block_size){
 	return sd_ro;
 }
 
+/**
+ * get ssim value
+ * @return
+ */
 double SSIM::get2() {
 	double ssim = 0;
 	bool show_progress = false;
@@ -77,6 +122,10 @@ double SSIM::get2() {
 
 	return ssim;
 }
+/**
+ * get ssim scalar value
+ * @return
+ */
 cv::Scalar SSIM::getMSSIM()
 {
 

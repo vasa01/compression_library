@@ -231,7 +231,7 @@ cmat cmat_new_set(cplx val, idx_t h, idx_t w);
 
 mat mat_set_between(mat m, idx_t r1, idx_t c1, idx_t r2, idx_t c2, double val);
 imat imat_set_between(imat m, idx_t r1, idx_t c1, idx_t r2, idx_t c2, int val);
-bmat bmat_set_between(bmat m, idx_t r1, idx_t c1, idx_t r2, idx_t c2, byte val);
+bmat bmat_set_between2(bmat m, idx_t r1, idx_t c1, idx_t r2, idx_t c2, byte val);
 cmat cmat_set_between(cmat m, idx_t r1, idx_t c1, idx_t r2, idx_t c2, cplx val);
 
 void mat_void(mat m);

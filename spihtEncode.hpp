@@ -1,3 +1,28 @@
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+/**
+ * @file	spihtEncode.hpp
+ *
+ * @brief	SPIHT implementation.
+ */
+
+
 #ifndef SPIHT_ENCODE_H
 #define SPIHT_ENCODE_H
 
@@ -18,6 +43,9 @@
 #include <memory>
 #include <vector>
 
+/**
+ * class SPIHT_Encoder_Contourlet
+ */
 class SPIHT_Encoder_Contourlet {
 	MyContourlet contourlet;
 	LIP3 lip;
@@ -34,13 +62,26 @@ class SPIHT_Encoder_Contourlet {
 	void initialize(BitOutputStream* bout);
 	int32_t get(cv::Point, int childNumber, int direction, SPIHT_Type s_type);
 public:
+	/**
+	 * create class
+	 * @param _contourlet
+	 * @param _num_stages
+	 */
 	SPIHT_Encoder_Contourlet(MyContourlet _contourlet, int _num_stages) {
 		contourlet = _contourlet;
 
 	}
+	/**
+	 * encode
+	 * @param bits - max bits size
+	 * @param bout - bitstream output
+	 */
 	void encode(int bits, BitOutputStream* bout);
 };
 
+/**
+ * class SPIHT_Encoder
+ */
 class SPIHT_Encoder {
 	Matrix* im;
 	LIP lip;
@@ -57,6 +98,13 @@ class SPIHT_Encoder {
 	SPIHT spiht;
 public:
 	SPIHT_Encoder(){};
+	/**
+	 *
+	 * @param _im
+	 * @param _level
+	 * @param _num_stages
+	 * @param channel
+	 */
 	SPIHT_Encoder(Matrix* _im, DwtLevels* _level, int _num_stages, int channel) { 
 		im = _im; 
 		//num_stages = _num_stages - 2;  

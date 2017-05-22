@@ -1,4 +1,29 @@
-#pragma once
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+
+/**
+ * @file	EZWEncode.hpp
+ *
+ * @brief	EZWEncode implementation.
+ */
+
+
 #ifndef EZWENCODE_H
 #define EZWENCODE_H
 
@@ -20,15 +45,17 @@
 #include "bitIOStream.hpp"
 
 
-
+/**
+ * class EZWEncode
+ */
 class EZWEncode {
 public:
 	EZWEncode();
-    void EZWEncode::encode(Matrix& mat, int32_t minThreshold = 0);
-	BitOutputStream* EZWEncode::getBitstream();
-	ostringstream* EZWEncode::getBitstreamString();
-	deque<uint8_t> EZWEncode::getSymbols();
-	int32_t EZWEncode::getThreshold();
+    void encode(Matrix mat, int32_t minThreshold = 0);
+	BitOutputStream* getBitstream();
+	ostringstream* getBitstreamString();
+	deque<uint8_t> getSymbols();
+	int32_t getThreshold();
 private:
 	deque<Element> elements;
 	list<int> subordList;
@@ -36,14 +63,14 @@ private:
 	ostringstream temp;
 	deque<uint8_t> symbols;
 	int32_t defaultThreshold;
-    int32_t EZWEncode::computeThreshold(Matrix mat);
-    void EZWEncode::init(Matrix& mat, int32_t threshold);
-    Element EZWEncode::codeElm(Matrix& mat, int x, int y, int32_t threshold);
-    Element::Code EZWEncode::computeElmCode(Matrix& mat, int x, int y, int32_t threshold);
-    bool EZWEncode::isZerotreeRoot(Matrix& mat, int x, int y, int32_t threshold);
-    void EZWEncode::dominantPass(Matrix& mat, int32_t threshold);
-	void EZWEncode::subordinatePass(int32_t threshold, int32_t minThreshold);
-	void EZWEncode::outputCode(Element::Code code);
+    int32_t computeThreshold(Matrix mat);
+    void init(Matrix& mat, int32_t threshold);
+    Element codeElm(Matrix& mat, int x, int y, int32_t threshold);
+    Element::Code computeElmCode(Matrix& mat, int x, int y, int32_t threshold);
+    bool isZerotreeRoot(Matrix& mat, int x, int y, int32_t threshold);
+    void dominantPass(Matrix& mat, int32_t threshold);
+	void subordinatePass(int32_t threshold, int32_t minThreshold);
+	void outputCode(Element::Code code);
 };
 
 

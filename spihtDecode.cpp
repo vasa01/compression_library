@@ -1,7 +1,36 @@
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+
+/**
+ * @file	spihtDecode.hpp
+ *
+ * @brief	SPIHT implementation.
+ */
 
 #include "dwtImage.hpp"
 #include "spihtDecode.hpp"
 
+/**
+ * init lists
+ * @param component
+ * @param bin
+ */
 void SPIHT_Decoder::initialize(int component, BitInputStream* bin) {
 	lip.clear();
 	lsp.clear();
@@ -25,6 +54,15 @@ void SPIHT_Decoder::initialize(int component, BitInputStream* bin) {
 	//cout << "LIS size" << lis.size() << endl;
 }
 
+/**
+ * get_successor
+ * @param x
+ * @param y
+ * @param sx
+ * @param sy
+ * @param childNumber
+ * @param s_type
+ */
 void SPIHT_Decoder::get_successor(int x, int y, int* sx, int* sy, int childNumber, SPIHT_Type s_type) {
 	//cout << "get_successor" << endl;
 	*sx = 2 * x;
@@ -60,6 +98,12 @@ void SPIHT_Decoder::get_successor(int x, int y, int* sx, int* sy, int childNumbe
 	}*/
 }
 
+/**
+ * decode
+ * @param component
+ * @param bits - max bits
+ * @param bin - input stream
+ */
 void SPIHT_Decoder::decode(int component, int bits, BitInputStream* bin) {
 	initialize(component, bin);
 	int bit_cnt = 0;
@@ -197,10 +241,15 @@ void SPIHT_Decoder::decode(int component, int bits, BitInputStream* bin) {
 		cv::waitKey();*/
 }
 
-Matrix SPIHT_Decoder::getOutput(int block_size){
+/**
+ * get output matrix
+ * @param block_size
+ * @return
+ */
+Matrix SPIHT_Decoder::getOutput(int block_size, int quant){
 	Matrix out = Matrix(width, height);
 
-	JoinSubimage join = JoinSubimage(width,height,level,1, block_size);
+	JoinSubimage join = JoinSubimage(width,height,level,1, block_size, quant);
 
 	join.add(DwtImage(spiht.LL.getCvMatDequant(1), level-1, 0, level, 1,Bands::LL));
 	
@@ -220,7 +269,11 @@ Matrix SPIHT_Decoder::getOutput(int block_size){
 	return Matrix(test);
 };
 
-///
+/**
+ * inti lists
+ * @param component
+ * @param bin - bit input stream
+ */
 void SPIHT_Decoder_Contourlet::initialize(int component, BitInputStream* bin) {
 	lip.clear();
 	lsp.clear();
@@ -278,6 +331,16 @@ void SPIHT_Decoder_Contourlet::initialize(int component, BitInputStream* bin) {
 	//cout << "LIS size" << lis.size() << endl;
 }
 
+/**
+ * get_successor
+ * @param x
+ * @param y
+ * @param sx
+ * @param sy
+ * @param childNumber
+ * @param direction
+ * @param s_type
+ */
 void SPIHT_Decoder_Contourlet::get_successor(int x, int y, int* sx, int* sy, int childNumber,int direction, SPIHT_Type s_type) {
 	//cout << "get_successor" << endl;
 	*sx = 2 * x;
@@ -294,6 +357,14 @@ void SPIHT_Decoder_Contourlet::get_successor(int x, int y, int* sx, int* sy, int
 	}
 }
 
+/**
+ * get point in struct
+ * @param point
+ * @param childNumber
+ * @param direction
+ * @param s_type
+ * @return
+ */
 int32_t SPIHT_Decoder_Contourlet::get(cv::Point point, int childNumber, int direction, SPIHT_Type s_type) {
 	if (s_type == SPIHT_Type::LOW) {
 		return matrixLow.get(point);
@@ -307,6 +378,14 @@ int32_t SPIHT_Decoder_Contourlet::get(cv::Point point, int childNumber, int dire
 	}
 }
 
+/**
+ * set point in struct
+ * @param point
+ * @param childNumber
+ * @param direction
+ * @param s_type
+ * @param value
+ */
 void SPIHT_Decoder_Contourlet::set(cv::Point point, int childNumber, int direction, SPIHT_Type s_type, int32_t value) {
 	if (s_type == SPIHT_Type::LOW) {
 		matrixLow.set(point, value);
@@ -322,6 +401,12 @@ void SPIHT_Decoder_Contourlet::set(cv::Point point, int childNumber, int directi
 	}
 }
 
+/**
+ * decode
+ * @param component
+ * @param bits - max bits
+ * @param bin - bit input stream
+ */
 void SPIHT_Decoder_Contourlet::decode(int component, int bits, BitInputStream* bin) {
 	initialize(component, bin);
 	int bit_cnt = 0;
@@ -458,7 +543,10 @@ void SPIHT_Decoder_Contourlet::decode(int component, int bits, BitInputStream* b
 	//imshow("Output", tmp2);
 	//cv::waitKey();
 }
-
+/**
+ * get decode Mycontourlet object
+ * @return
+ */
 MyContourlet SPIHT_Decoder_Contourlet::getOutput() {
 	return MyContourlet(matrixHigh,matrixLow,maxChild);
 }

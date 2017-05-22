@@ -1,3 +1,27 @@
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+/**
+ * @file	spihtDecode.hpp
+ *
+ * @brief	SPIHT implementation.
+ */
+
 #ifndef SPIHT_DECODE_H
 #define SPIHT_DECODE_H
 
@@ -14,8 +38,9 @@
 #include "spiht.hpp"
 #include "tool.hpp"
 
-//using namespace std;
-//SPIHT_Encoder_Contourlet
+/**
+ * class SPIHT_Decoder_Contourlet
+ */
 class SPIHT_Decoder_Contourlet {
 	//Matrix *im;
 	int num_stages;
@@ -46,6 +71,9 @@ public:
 
 };
 
+/**
+ * class SPIHT_Decoder
+ */
 class SPIHT_Decoder {
 	//Matrix *im;
 	int num_stages;
@@ -88,7 +116,7 @@ public:
 	}
 	void decode(int component, int bits, BitInputStream* bin);
 	
-	Matrix getOutput(int block_size);
+	Matrix getOutput(int block_size,int quant);
 
 };
 

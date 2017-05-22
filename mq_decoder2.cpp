@@ -1,9 +1,39 @@
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+
+/**
+ * @file	mq_decoder2.cpp
+ *
+ * @brief	mq decoder implementation.
+ */
+
 #include "mq_decoder2.hpp"
 
 mq_decoder::mq_decoder()
 	{
 	}
 
+/**
+ * reset mq decoder
+ * @param _buf
+ * @param max_len
+ */
 void mq_decoder::reset(const uint8_t *_buf, const int32_t& max_len)
 	{
 	inbuf = _buf;
@@ -12,6 +42,11 @@ void mq_decoder::reset(const uint8_t *_buf, const int32_t& max_len)
 	init();
 	}
 
+/**
+ * get bit by ctx
+ * @param ctx
+ * @return
+ */
 bool mq_decoder::get_bit(const uint8_t& ctx) //throw (error)
 	{
 	bool bit;
@@ -38,7 +73,10 @@ bool mq_decoder::get_bit(const uint8_t& ctx) //throw (error)
 	return bit;
 	}
 
-void mq_decoder::init()// throw (error)
+/**
+ * init mq decoder
+ */
+void mq_decoder::init()
 	{
 	mq_coder::init();
 
@@ -56,6 +94,11 @@ void mq_decoder::init()// throw (error)
 	A = 0x8000;
 	}
 
+/**
+ * exchange_mps
+ * @param ctx
+ * @return - bit
+ */
 bool mq_decoder::exchange_mps(const uint8_t& ctx)
 	{
 	const state_t& state = *state_mapping[ctx];
@@ -70,6 +113,11 @@ bool mq_decoder::exchange_mps(const uint8_t& ctx)
 		}
 	}
 
+/**
+ * exchange_lps
+ * @param ctx
+ * @return  - bit
+ */
 bool mq_decoder::exchange_lps(const uint8_t& ctx)
 	{
 	const state_t& state = *state_mapping[ctx];
@@ -86,7 +134,10 @@ bool mq_decoder::exchange_lps(const uint8_t& ctx)
 		}
 	}
 
-void mq_decoder::byte_in() //throw (error)
+/**
+ * byte_in
+ */
+void mq_decoder::byte_in()
 	{
 	if(inbuf_pos < inbuf_max_len) {
 		uint8_t buf;
@@ -119,8 +170,10 @@ void mq_decoder::byte_in() //throw (error)
 		CT = 8;
 		}
 	}
-
-void mq_decoder::renorm()// throw (error)
+/**
+ * renorm
+ */
+void mq_decoder::renorm()
 	{
 	do {
 		if(CT == 0) {

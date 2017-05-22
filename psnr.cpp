@@ -1,6 +1,34 @@
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+
+/**
+ * @file	psnr.cpp
+ *
+ * @brief	PSNR implementation.
+ */
 
 #include "psnr.hpp"
 
+/**
+ * getPSNR
+ * @return  - psnr value
+ */
 double PSNR::getPSNR() {
 	cv::Mat s1;
 	absdiff(I1, I2, s1);       // |I1 - I2|
@@ -22,6 +50,10 @@ double PSNR::getPSNR() {
 	//return 10 * log10((255 * 255) / mse());
 }
 
+/**
+ * MSE
+ * @return MSE value
+ */
 double PSNR::mse() {
 	double difference = 0;
 	double sigma = 0;
@@ -30,7 +62,7 @@ double PSNR::mse() {
 	{
 		for (int j = 0; j<I1.cols; j++)
 		{
-			(double)difference = (double)I1.at<uchar>(i, j) - (double)I2.at<uchar>(i, j);
+			difference = (double)I1.at<uchar>(i, j) - (double)I2.at<uchar>(i, j);
 			sigma = sigma + (double)difference*(double)difference;
 		}
 	}

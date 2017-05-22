@@ -1,8 +1,26 @@
-/**********************************************************************************************//**
-* @file	cdf53.cpp
-*
-* @brief	Implements the cdf 5/3 class.
-**************************************************************************************************/
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+/**
+ * @file	cdf53.cpp
+ *
+ * @brief	Implements the cdf 53 class.
+ */
 
 #include "cdf53.hpp"
 
@@ -11,19 +29,35 @@
 
 #define DWT_VISUAL 0
 
-CDF53::CDF53(int level, cv::Mat& image, int block_size) {
+/**
+ * create cdf53
+ * @param level
+ * @param image
+ * @param block_size
+ */
+CDF53::CDF53(int level, cv::Mat& image, int quant, int block_size) {
 	this->levels = level;
 	this->image = image;
 	this->block_size = block_size;
 	this->countChannels = image.channels();
-	}
+	this->quant = quant;
+}
 
 
+/**
+ * getLevelsObject
+ * @return
+ */
 DwtLevels* CDF53::getLevelsObject() {
 	return dwtLevels;
 	}
 
-
+/**
+ * predict
+ * @param line
+ * @param coef1
+ * @param coef2
+ */
 void CDF53::predict(Line<float> line, double coef1, double coef2) {
 	/*for(size_t i = 1;i< line.size() -2 ;i = i+2){
 	line[i] += coef * ( line[i-1] + line[i+1]);
@@ -39,7 +73,11 @@ void CDF53::predict(Line<float> line, double coef1, double coef2) {
 		line[line.size() - 1] -= 2 * coef1 * line[line.size() - 2];
 	}
 
-
+/**
+ * update
+ * @param line
+ * @param coef
+ */
 void CDF53::update(Line<float> line, double coef) {
 	/*for(size_t i = 2;i< line.size();i = i+2){
 	line[i] += coef * ( line[i-1] + line[i+1]);
@@ -54,7 +92,10 @@ void CDF53::update(Line<float> line, double coef) {
 
 	}
 
-
+/**
+ * forward
+ * @param line
+ */
 void CDF53::forward(Line<float> line) {
 	assert(line.size() % 2 == 0);
 
@@ -84,7 +125,10 @@ void CDF53::forward(Line<float> line) {
 		}
 	}
 
-
+/**
+ * inverse
+ * @param line
+ */
 void CDF53::inverse(Line<float> line) {
 	assert(line.size() % 2 == 0);
 
@@ -106,6 +150,10 @@ void CDF53::inverse(Line<float> line) {
 	predict(line, -p1, -u1);
 }
 
+/**
+ * inverse2 - test
+ * @param line
+ */
 void CDF53::inverse2(Line<float> line) {
 	assert(line.size() % 2 == 0);
 
@@ -142,10 +190,13 @@ void CDF53::inverse2(Line<float> line) {
 //	std::cout << ";" << endl;
 //	}
 
-
+/**
+ * forward 2d
+ * @param image
+ */
 void CDF53::forward2d(cv::Mat& image) {
 	//const int c = (int)image.channels();	
-	this->dwtLevels = new DwtLevels(levels, countChannels, block_size);
+	this->dwtLevels = new DwtLevels(levels, countChannels, block_size, quant);
 	cv::Mat *channel = new cv::Mat[countChannels];
 	split(image, channel);
 	//cout << countChannels << endl;
@@ -200,7 +251,11 @@ void CDF53::forward2d(cv::Mat& image) {
 
 	}
 
-
+/**
+ * inverse 2d
+ * @param image
+ * @param minlevel
+ */
 void CDF53::inverse2d(cv::Mat& image, int minlevel) {
 	//const int c = (int)image.channels();
 	cv::Mat *channel = new cv::Mat[countChannels];
@@ -253,7 +308,10 @@ void CDF53::inverse2d(cv::Mat& image, int minlevel) {
 //	sub.push_back(LL.clone());
 //}
 
-
+/**
+ * get levels
+ * @return
+ */
 vector<DwtImage> CDF53::getLevels() {
 	assert(!dwtLevels->getIsEmpty());
 	std::cout << "not empty" << endl;
@@ -268,74 +326,8 @@ vector<DwtImage> CDF53::getLevels() {
 	}
 
 
-//void getMinMax(cv::Mat src, float &min, float &max) {
-//	assert(!src.empty());
-//	cv::Mat src2;
-//
-//	src.convertTo(src2, CV_32FC1);
-//	src2 /= 256;
-//	min = 1000;
-//	max = 0;
-//	//cout << "seem" << endl;
-//	for(int y = 0; y < src.rows; y++) {
-//		for(int x = 0; x < src.cols; x++) {
-//			/*cout << "seem" << endl;
-//			cout << x << endl;
-//			cout << y << endl;*/
-//			if(src2.at<float>(y, x) < min) {
-//				min = src2.at<float>(y, x);
-//				}
-//			if(src2.at<float>(y, x) > max) {
-//				max = src2.at<float>(y, x);
-//				}
-//
-//			}
-//		}
-//	}
-
-
-double CDF53::test() {
-	float min, max;
-	cv::Mat orgImage2 = image.clone();
-	cv::Mat orgImage = image.clone();
-	//orgImage.convertTo(orgImage, CV_32FC3);
-	cout << image.cols << endl;
-	forward2d(image);
-	imwrite("./forward.bmp", image);
-	if(0) { //DWT_VISUAL
-		vector<DwtImage> vectorLevel = getLevels();
-		cout << vectorLevel.size() << endl;
-		for(int i = 0; i < vectorLevel.size(); i++) {
-			vector<DwtImage*> vectorSubbands = vectorLevel.at(i).createBands();
-
-			for(int a = 0; a < vectorSubbands.size(); a++) {
-				if(DWT_VISUAL) {
-					imshow("Level_" + Tool::IntToString(vectorSubbands.at(a)->getLevel()) +
-						   " Type_" + vectorSubbands.at(a)->getTypeSub() +
-						   " Channel_" + Tool::IntToString(vectorSubbands.at(a)->getChannel()), vectorSubbands.at(a)->getImage());
-					}
-				/*if (true) {
-				getMinMax(vectorSubbands.at(0)->getImage(), min, max);
-				cout << max;
-				cout << "max";
-				//cout << max << endl;
-				}*/
-				}
-			/*if (i == 0) {
-			cout << vectorSubbands.at(2).getImage() << endl;
-			}*/
-
-			}
-		cv::waitKey();
-		}
 
 
 
-	inverse2d(image);
-	imwrite("./invers.bmp", image);
-	cv::Mat inverse = cv::imread("./invers.bmp", CV_LOAD_IMAGE_COLOR);
-	cout << "diff image: " << Tool::Diff(inverse, orgImage2) << endl;
-	return 0;//Tool::Diff(image,orgImage);
-	}
 
 

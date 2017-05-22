@@ -1,3 +1,28 @@
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+
+/**
+ * @file	spiht.hpp
+ *
+ * @brief	SPIHT implementation.
+ */
+
 #ifndef SPIHT_H
 #define SPIHT_H
 
@@ -22,14 +47,10 @@ using namespace std;
 enum SPIHT_Type { LL, HL, HH, LH, LOW, HIGH };
 enum LIS_Type { LIS_A, LIS_B };
 
-//class SPIHT_struct {
-//public:
-//
-//private:
-//	Matrix mat;
-//	int childNumber;
-//};
 
+/**
+ * struct SPIHT
+ */
 struct SPIHT {
 
 	Matrix LL;
@@ -73,6 +94,13 @@ struct SPIHT {
 		}
 	};
 
+	/**
+	 * set point value in struct
+	 * @param point
+	 * @param childNumber
+	 * @param s_type
+	 * @param value
+	 */
 	void set(cv::Point point, int childNumber, SPIHT_Type s_type, int32_t value) {
 		if (childNumber >= max_child) {
 			cerr << "false set" << endl;
@@ -107,7 +135,9 @@ struct SPIHT {
 };
 
 
-
+/**
+ * struct PixItem3
+ */
 struct PixItem3 {
 	int x;
 	int y;
@@ -122,7 +152,9 @@ struct PixItem3 {
 };
 
 
-
+/**
+ * struct SetItem3
+ */
 struct SetItem3 {
 	int x;
 	int y;

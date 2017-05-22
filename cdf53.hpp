@@ -1,8 +1,26 @@
-/**********************************************************************************************//**
-* @file	cdf53.hpp
-*
-* @brief	Declares the cdf 5/3 class.
-/**************************************************************************************************/
+/**
+ * Image compression library supporting wavelet and contourlet
+ * transformation with the possibility of encoding algorithms EZW, SPIHT and EBCOT.
+ * (C) Vaclav Bradac
+ *
+ * This program is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+/**
+ * @file	cdf53.hpp
+ *
+ * @brief	Implements the cdf 53 class.
+ */
 
 #ifndef CDF53_H
 #define CDF53_H
@@ -24,29 +42,17 @@
 #include "dwtImage.hpp"
 #include "dwtLevels.hpp"
 
-/**********************************************************************************************//**
-* @def	a1, a2, a3, a4, k1, k2
-*
-* @brief	A macros that defines coef on CDF9/7.
-*
-* @author	Vasa 0
-* @date	06.01.2017
-**************************************************************************************************/
 
-#define k1 (1)
-#define p1 (0.5)
-#define u1 (0.25)
+const double k1 =  1.0;
+const double p1 = 0.5;
+const double u1 = 0.25;
 
-#define s1 1.41421356237309504880
-#define s2 (0.70710678118654752440)
+const double s1 = 1.41421356237309504880;
+const double s2 =  0.70710678118654752440;
 
-//static const int    dwt_cdf53_k_s = 1;
-//static const float  dwt_cdf53_p1_s = 0.5;
-//static const float  dwt_cdf53_u1_s = 0.25;
-//static const float  dwt_cdf53_s1_s = 1.41421356237309504880;
-//static const float  dwt_cdf53_s2_s = 0.70710678118654752440;
-
-
+/**
+ * class CDF53
+ */
 class CDF53 {
 	int levels;
 	int countChannels;
@@ -56,9 +62,10 @@ class CDF53 {
 	vector<float> tempbank;
 	DwtLevels *dwtLevels;
 	int block_size;
+	int quant;
 public:
 
-	CDF53(int levels, cv::Mat& image, int block_size=64);
+	CDF53(int levels, cv::Mat& image, int quant, int block_size=64);
 	void forward2d(cv::Mat& image);
 	void inverse2d(cv::Mat& image, int minlevel = 0);
 	cv::Mat getForward() {
@@ -71,7 +78,7 @@ public:
 	DwtLevels* getLevelsObject();
 	//void getSubBands(vector<cv::Mat>& sub, cv::Mat& image);
 	//double diff(const Mat& test, const Mat& ref);
-	vector<DwtImage> CDF53::getLevels();
+	vector<DwtImage> getLevels();
 private:
 
 	void inverse(Line<float> line);
