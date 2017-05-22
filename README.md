@@ -19,6 +19,7 @@ C ++ 11
 Compiler g ++
 
 
+
 ###############################################################################
 # Help  - compression library                                                 #
 ###############################################################################
@@ -37,3 +38,9 @@ Compiler g ++
 # -q  number - if number == 0 quantization turn off else turn on              #
 ###############################################################################
 
+Based:
+
+EZW - https://github.com/Zycon42/wavelet
+SPIHT - https://github.com/renp/imshrinker
+EBCOT - https://github.com/AD-530/WorldViewer
+Conturlet - https://github.com/lxj0276/myContourLet
