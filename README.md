@@ -35,7 +35,7 @@ https://github.com/vasa01/compression_library
 # -l  number - set level number in transform                                  #
 # -s  number - set number maxsize compresss file in kB                        #
 # -p  number - set number maxplanes in encoding coef                          #
-# -b  number - set number block size in encoding coef EBCOT (defaul 64)       #
+# -b  number - set number block size in encoding coef EBCOT (defaul 128)      #
 # -q  number - if number == 0 quantization turn off else turn on              #
 ###############################################################################
 

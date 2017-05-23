@@ -358,7 +358,7 @@ private:
 	cv::Mat quant(cv::Mat mat, int level, int maxLevel) {
 		cv::Mat result = mat.clone();
 
-		result *= (1.25*(level+1));
+		result *= (1.25*((level/2)+1));
 
 		return result;
 	}

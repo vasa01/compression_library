@@ -75,7 +75,9 @@ using namespace COMPR_LBR;
 
 		if(levelNum == 0) {
 			levelNum = (LEVEL_NUM)static_cast<int32_t>(floor(log10(image.cols) / log10(2.0)));
-			//cout << (int)levelNum << endl;
+			if(transType == TRANS_TYPE::CON){
+				levelNum =(LEVEL_NUM)(4);
+			}
 		}
 		
 		if(block_size > image.cols) {

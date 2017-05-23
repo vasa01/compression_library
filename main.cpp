@@ -64,7 +64,7 @@ int main(int argc, char* argv[]){
 	int bytes = 0;
 	int encode = 0;
 	int quant = 1;
-	int block_size = 64;
+	int block_size = 128;
 	bool bitPlaneTest = false;
 	bool byteTest = false;
 	bool maxTest = false;
@@ -115,7 +115,7 @@ int main(int argc, char* argv[]){
 			    std::cout << "# -l  number - set level number in transform                                  #" << std::endl;
 			    std::cout << "# -s  number - set number maxsize compresss file in kB                        #" << std::endl;
 			    std::cout << "# -p  number - set number maxplanes in encoding coef                          #" << std::endl;
-			    std::cout << "# -b  number - set number block size in encoding coef EBCOT (defaul 64)       #" << std::endl;
+			    std::cout << "# -b  number - set number block size in encoding coef EBCOT (defaul 128)      #" << std::endl;
             		    std::cout << "# -q  number - if number == 0 quantization turn off else turn on   		#" << std::endl;
             		    std::cout << "###############################################################################" << std::endl;
 			return 0;
